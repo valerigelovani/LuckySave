@@ -1,0 +1,171 @@
+<div class="page draw-page">
+  @if (!group()) {
+    <app-empty-state
+      icon="workspace_premium"
+      [title]="'draw.noGroupTitle' | t"
+      [message]="'draw.noGroupMessage' | t"
+    >
+      <a class="btn btn--primary" routerLink="/dashboard">{{ 'draw.goToDashboard' | t }}</a>
+    </app-empty-state>
+  } @else {
+    <header class="page-header">
+      <div>
+        <p class="page-header__eyebrow">{{ group()!.name }}</p>
+        <h1 class="page-header__title">{{ 'draw.title' | t }}</h1>
+        <p class="page-header__subtitle">
+          {{ 'draw.subtitle' | t: { current: i18n.monthOrdinal(group()!.currentMonth), total: group()!.durationMonths } }}
+        </p>
+      </div>
+      <app-countdown-display [targetDate]="group()!.nextDrawDate" [label]="'draw.nextDrawWindow' | t"></app-countdown-display>
+    </header>
+
+    @if (phase() === 'spinning') {
+      <section class="draw-stage draw-stage--spinning">
+        <p class="draw-stage__eyebrow">{{ 'draw.selecting' | t }}</p>
+        @for (n of [spinTick()]; track n) {
+          <div class="slot-card">
+            <app-member-avatar
+              [initials]="spinMember()?.avatarInitials ?? ''"
+              [color]="spinMember()?.avatarColor ?? '#5B4FE9'"
+              [size]="96"
+            ></app-member-avatar>
+            <p class="slot-card__name">{{ spinMember()?.name }}</p>
+          </div>
+        }
+        <p class="draw-stage__hint">
+          <mat-icon aria-hidden="true">verified_user</mat-icon>
+          {{ 'draw.holdTight' | t }}
+        </p>
+      </section>
+    } @else if (phase() === 'revealed' && winner(); as w) {
+      <section class="draw-stage draw-stage--revealed">
+        <div class="confetti-layer" aria-hidden="true">
+          @for (p of confetti(); track p.id) {
+            <span
+              class="confetti-piece"
+              [style.left.%]="p.left"
+              [style.background]="p.color"
+              [style.animationDelay.ms]="p.delay"
+              [style.animationDuration.ms]="p.duration"
+              [style.width.px]="p.size"
+              [style.height.px]="p.size * 2.6"
+              [style.transform]="'rotate(' + p.rotation + 'deg)'"
+            ></span>
+          }
+        </div>
+
+        <span class="winner-card__label">
+          <mat-icon aria-hidden="true">emoji_events</mat-icon>
+          {{ 'draw.thisMonthsWinner' | t }}
+        </span>
+        <app-member-avatar
+          [initials]="w.avatarInitials"
+          [color]="w.avatarColor"
+          [size]="112"
+          [ring]="true"
+        ></app-member-avatar>
+        <h2 class="winner-card__name">{{ w.name }}</h2>
+        <p class="winner-card__prize">{{ i18n.formatCurrency(prizeAmount()) }}</p>
+        <p class="winner-card__note">
+          <mat-icon aria-hidden="true">lock</mat-icon>
+          {{ 'draw.lockedOutNote' | t: { name: w.name } }}
+        </p>
+
+        <div class="actions-row">
+          <a class="btn btn--primary btn--lg" routerLink="/group">
+            <mat-icon aria-hidden="true">groups</mat-icon>
+            {{ 'common.viewGroup' | t }}
+          </a>
+          <a class="btn btn--secondary btn--lg" routerLink="/history">
+            <mat-icon aria-hidden="true">history</mat-icon>
+            {{ 'common.viewHistory' | t }}
+          </a>
+        </div>
+      </section>
+    } @else if (isCompleted()) {
+      <app-empty-state
+        icon="task_alt"
+        [title]="'draw.circleFinishedTitle' | t"
+        [message]="'draw.circleFinishedMessage' | t"
+      >
+        <a class="btn btn--primary" routerLink="/history">{{ 'common.viewFullHistory' | t }}</a>
+      </app-empty-state>
+    } @else if (hasDrawnThisMonth() && thisMonthResult(); as r) {
+      <section class="draw-stage draw-stage--settled">
+        <span class="winner-card__label">
+          <mat-icon aria-hidden="true">emoji_events</mat-icon>
+          {{ 'draw.monthWinner' | t: { month: i18n.monthOrdinal(r.month) } }}
+        </span>
+        <app-member-avatar
+          [initials]="r.winnerInitials"
+          [color]="r.winnerColor"
+          [size]="96"
+          [ring]="true"
+        ></app-member-avatar>
+        <h2 class="winner-card__name">{{ r.winnerName }}</h2>
+        <p class="winner-card__prize">{{ i18n.formatCurrency(r.prizeAmount) }}</p>
+        <p class="winner-card__note">{{ 'draw.drawCompleteNote' | t }}</p>
+        <div class="actions-row">
+          <a class="btn btn--secondary btn--lg" routerLink="/group">{{ 'common.viewGroup' | t }}</a>
+          <a class="btn btn--ghost btn--lg" routerLink="/history">{{ 'common.viewHistory' | t }}</a>
+        </div>
+      </section>
+    } @else {
+      <section class="draw-intro">
+        <div class="pot-banner">
+          <span class="pot-banner__label">{{ 'draw.potForMonth' | t: { month: i18n.monthOrdinal(group()!.currentMonth) } }}</span>
+          <span class="pot-banner__amount">{{ i18n.formatCurrency(prizeAmount()) }}</span>
+          <span class="pot-banner__sub">{{ 'draw.guaranteedNote' | t }}</span>
+        </div>
+
+        <div class="fairness-note">
+          <mat-icon aria-hidden="true">verified_user</mat-icon>
+          <div>
+            <p class="fairness-note__title">{{ 'draw.fairnessTitle' | t }}</p>
+            <p class="fairness-note__text">{{ 'draw.fairnessText' | t }}</p>
+          </div>
+        </div>
+
+        <app-section-header
+          [title]="'draw.eligibleTitle' | t"
+          [subtitle]="'draw.eligibleSubtitle' | t: { count: eligible().length }"
+        ></app-section-header>
+
+        <div class="eligible-grid">
+          @for (m of eligible(); track m.id) {
+            <div class="eligible-chip">
+              <app-member-avatar
+                [initials]="m.avatarInitials"
+                [color]="m.avatarColor"
+                [size]="48"
+                [badge]="m.isCurrentUser ? 'you' : null"
+              ></app-member-avatar>
+              <span>{{ m.name }}</span>
+            </div>
+          }
+        </div>
+
+        @if (ineligible().length > 0) {
+          <div class="ineligible-row">
+            <span class="ineligible-row__label">{{ 'draw.alreadyWonExcluded' | t }}</span>
+            <div class="ineligible-row__avatars">
+              @for (m of ineligible(); track m.id) {
+                <app-member-avatar [initials]="m.avatarInitials" [color]="m.avatarColor" [size]="30"></app-member-avatar>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="actions-row">
+          <button type="button" class="btn btn--primary btn--lg" [disabled]="!canDraw()" (click)="startDraw()">
+            <mat-icon aria-hidden="true">workspace_premium</mat-icon>
+            {{ 'common.startDraw' | t }}
+          </button>
+        </div>
+        @if (blockedReasonKey()) {
+          <p class="draw-blocked-reason">{{ blockedReasonKey() | t }}</p>
+        }
+      </section>
+    }
+  }
+</div>

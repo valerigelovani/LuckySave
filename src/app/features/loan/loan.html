@@ -1,0 +1,153 @@
+<div class="page loan-page">
+  @if (group(); as g) {
+    <header class="page-header">
+      <div>
+        <p class="page-header__eyebrow">{{ 'loan.eyebrow' | t }}</p>
+        <h1 class="page-header__title">{{ 'loan.title' | t }}</h1>
+        <p class="page-header__subtitle">{{ 'loan.subtitle' | t }}</p>
+      </div>
+    </header>
+
+    @if (outstandingLoans().length > 0) {
+      <app-notification-banner
+        variant="warning"
+        icon="account_balance"
+        [title]="'loan.bankCoverageAlert' | t: { count: outstandingLoans().length }"
+        [message]="'loan.bankCoverageAlertSub' | t"
+      ></app-notification-banner>
+    }
+
+    <section class="loan-simulate-card">
+      <div class="loan-simulate-card__icon">
+        <mat-icon aria-hidden="true">shield</mat-icon>
+      </div>
+      <div class="loan-simulate-card__body">
+        <p class="loan-simulate-card__title">{{ 'loan.simulateTitle' | t }}</p>
+        @if (canSimulate()) {
+          <p class="loan-simulate-card__text">{{ 'loan.simulateTextCan' | t: { month: i18n.monthOrdinal(g.currentMonth) } }}</p>
+        } @else {
+          <p class="loan-simulate-card__text">{{ 'loan.simulateTextCant' | t: { month: i18n.monthOrdinal(g.currentMonth) } }}</p>
+        }
+      </div>
+      <button
+        type="button"
+        class="btn btn--secondary"
+        [disabled]="!canSimulate()"
+        (click)="simulateMissedPayment()"
+      >
+        <mat-icon aria-hidden="true">report</mat-icon>
+        {{ 'common.simulateMissedPayment' | t }}
+      </button>
+    </section>
+
+    <section>
+      <app-section-header
+        [title]="'loan.outstandingTitle' | t"
+        [subtitle]="'loan.outstandingSubtitle' | t"
+      ></app-section-header>
+
+      @if (outstandingLoans().length > 0) {
+        <div class="loan-list">
+          @for (l of outstandingLoans(); track l.id) {
+            <div class="loan-row">
+              <app-member-avatar
+                [initials]="memberFor(l.memberId)?.avatarInitials ?? ''"
+                [color]="memberFor(l.memberId)?.avatarColor ?? '#5B4FE9'"
+                [size]="42"
+              ></app-member-avatar>
+              <div class="loan-row__info">
+                <p class="loan-row__name">{{ l.memberName }}</p>
+                <p class="loan-row__meta">{{ 'loan.monthOpened' | t: { month: i18n.monthOrdinal(l.month), date: i18n.formatDate(l.createdAt) } }}</p>
+              </div>
+              <div class="loan-row__balance">
+                <span>{{ 'loan.remainingBalance' | t }}</span>
+                <strong>{{ i18n.formatCurrency(l.remainingBalance) }}</strong>
+              </div>
+              <app-status-chip variant="danger" [label]="'status.outstanding' | t" icon="schedule"></app-status-chip>
+              <button type="button" class="btn btn--mint btn--sm" (click)="repay(l.id)">
+                <mat-icon aria-hidden="true">task_alt</mat-icon>
+                {{ 'common.markRepaid' | t }}
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="card">
+          <app-empty-state
+            icon="verified"
+            [title]="'loan.noOutstandingTitle' | t"
+            [message]="'loan.noOutstandingMessage' | t"
+          ></app-empty-state>
+        </div>
+      }
+    </section>
+
+    @if (repaidLoans().length > 0) {
+      <section>
+        <app-section-header [title]="'loan.repaidTitle' | t" [subtitle]="'loan.repaidSubtitle' | t"></app-section-header>
+        <div class="loan-list">
+          @for (l of repaidLoans(); track l.id) {
+            <div class="loan-row loan-row--settled">
+              <app-member-avatar
+                [initials]="memberFor(l.memberId)?.avatarInitials ?? ''"
+                [color]="memberFor(l.memberId)?.avatarColor ?? '#5B4FE9'"
+                [size]="42"
+              ></app-member-avatar>
+              <div class="loan-row__info">
+                <p class="loan-row__name">{{ l.memberName }}</p>
+                <p class="loan-row__meta">{{ 'loan.monthRepaid' | t: { month: i18n.monthOrdinal(l.month), date: l.repaidAt ? i18n.formatDate(l.repaidAt) : '' } }}</p>
+              </div>
+              <div class="loan-row__balance">
+                <span>{{ 'loan.amountCovered' | t }}</span>
+                <strong>{{ i18n.formatCurrency(l.amount) }}</strong>
+              </div>
+              <app-status-chip variant="success" [label]="'status.repaid' | t" icon="check_circle"></app-status-chip>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <section>
+      <app-section-header
+        [title]="'loan.eventLogTitle' | t"
+        [subtitle]="'loan.eventLogSubtitle' | t"
+      ></app-section-header>
+
+      @if (loanEvents().length > 0) {
+        <div class="card timeline-card">
+          @for (item of loanEvents(); track item.id; let last = $last) {
+            <app-timeline-item
+              [icon]="historyIcon(item.type).icon"
+              [variant]="historyIcon(item.type).variant"
+              [title]="i18n.tHistoryTitle(item)"
+              [description]="i18n.tHistoryDescription(item)"
+              [meta]="i18n.formatDate(item.timestamp)"
+              [amountLabel]="item.amount ? i18n.formatCurrency(item.amount) : ''"
+              [isLast]="last"
+            ></app-timeline-item>
+          }
+        </div>
+      } @else {
+        <div class="card">
+          <app-empty-state
+            icon="history"
+            [title]="'loan.noEventsTitle' | t"
+            [message]="'loan.noEventsMessage' | t"
+          ></app-empty-state>
+        </div>
+      }
+    </section>
+  } @else {
+    <app-empty-state
+      icon="account_balance"
+      [title]="'loan.noGroupTitle' | t"
+      [message]="'loan.noGroupMessage' | t"
+    >
+      <div class="actions-row">
+        <a class="btn btn--primary" routerLink="/create-group">{{ 'common.createAGroup' | t }}</a>
+        <a class="btn btn--secondary" routerLink="/join-group">{{ 'common.joinAGroup' | t }}</a>
+      </div>
+    </app-empty-state>
+  }
+</div>

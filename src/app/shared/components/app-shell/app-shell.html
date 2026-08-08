@@ -1,0 +1,94 @@
+<div class="shell">
+  <aside class="shell__rail">
+    <a routerLink="/dashboard" class="rail__logo" aria-label="LuckySave home">
+      <span class="rail__logo-mark">
+        <mat-icon aria-hidden="true">savings</mat-icon>
+      </span>
+      <span class="rail__logo-text">LuckySave</span>
+    </a>
+
+    <nav class="rail__nav">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="rail__link--active"
+          class="rail__link"
+        >
+          <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+          <span>{{ item.labelKey | t }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="rail__lang" role="group" aria-label="Language">
+      @for (lang of languages; track lang) {
+        <button
+          type="button"
+          class="rail__lang-btn"
+          [class.rail__lang-btn--active]="i18n.lang() === lang"
+          (click)="setLanguage(lang)"
+        >
+          {{ langLabel(lang) }}
+        </button>
+      }
+    </div>
+
+    <a routerLink="/profile" routerLinkActive="rail__user--active" class="rail__user">
+      <app-member-avatar
+        [initials]="currentUser().avatarInitials"
+        [color]="currentUser().avatarColor"
+        [size]="36"
+      ></app-member-avatar>
+      <span class="rail__user-name">{{ currentUser().name }}</span>
+    </a>
+  </aside>
+
+  <div class="shell__main">
+    <header class="shell__topbar">
+      <a routerLink="/dashboard" class="topbar__brand">
+        <span class="topbar__brand-mark">
+          <mat-icon aria-hidden="true">savings</mat-icon>
+        </span>
+        <span>LuckySave</span>
+      </a>
+      <div class="topbar__actions">
+        <div class="topbar__lang" role="group" aria-label="Language">
+          @for (lang of languages; track lang) {
+            <button
+              type="button"
+              class="topbar__lang-btn"
+              [class.topbar__lang-btn--active]="i18n.lang() === lang"
+              (click)="setLanguage(lang)"
+            >
+              {{ langLabel(lang) }}
+            </button>
+          }
+        </div>
+        <a routerLink="/profile" class="topbar__avatar">
+          <app-member-avatar
+            [initials]="currentUser().avatarInitials"
+            [color]="currentUser().avatarColor"
+            [size]="34"
+          ></app-member-avatar>
+        </a>
+      </div>
+    </header>
+
+    <main class="shell__content">
+      <div class="ls-container">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+
+  <nav class="shell__bottom-nav" aria-label="Primary">
+    @for (item of primaryNavItems; track item.path) {
+      <a [routerLink]="item.path" routerLinkActive="bottom-nav__link--active" class="bottom-nav__link">
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+        <span>{{ item.labelKey | t }}</span>
+      </a>
+    }
+  </nav>
+</div>
+
+<app-toast-container></app-toast-container>

@@ -1,0 +1,198 @@
+<div class="page dashboard">
+  @if (activeGroup(); as group) {
+    <header class="dashboard__greeting">
+      <div>
+        <p class="page-header__eyebrow">{{ 'dashboard.welcomeBack' | t }}</p>
+        <h1 class="page-header__title">{{ 'dashboard.hi' | t: { name: currentUser().name.split(' ')[0] } }}</h1>
+        <p class="page-header__subtitle">{{ 'dashboard.subtitle' | t }}</p>
+      </div>
+
+      @if (myGroups().length > 1) {
+        <div class="group-switcher">
+          @for (g of myGroups(); track g.id) {
+            <button
+              type="button"
+              class="group-switcher__chip"
+              [class.group-switcher__chip--active]="g.id === group.id"
+              (click)="switchGroup(g.id)"
+            >
+              {{ g.name }}
+            </button>
+          }
+        </div>
+      }
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-card__top">
+        <div class="hero-card__identity">
+          <div class="hero-card__title-row">
+            <h2>{{ group.name }}</h2>
+            @if (groupStatus(); as s) {
+              <app-status-chip [variant]="s.variant" [label]="s.labelKey | t" [icon]="s.icon"></app-status-chip>
+            }
+          </div>
+          <p class="hero-card__code">{{ 'dashboard.groupId' | t: { code: code() } }}</p>
+        </div>
+        <app-countdown-display [targetDate]="group.nextDrawDate" [label]="'dashboard.nextDraw' | t"></app-countdown-display>
+      </div>
+
+      <div class="hero-card__progress">
+        <div class="hero-card__progress-labels">
+          <span>{{ 'dashboard.monthOf' | t: { current: i18n.monthOrdinal(group.currentMonth), total: group.durationMonths } }}</span>
+          <span>{{ 'dashboard.percentComplete' | t: { percent: progressPercent() } }}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar__fill" [style.width.%]="progressPercent()"></div>
+        </div>
+      </div>
+    </section>
+
+    @if (member(); as m) {
+      @if (m.currentPaymentStatus === 'pending') {
+        <app-notification-banner
+          variant="warning"
+          icon="schedule"
+          [title]="'dashboard.contributionDueTitle' | t"
+          [message]="'dashboard.contributionDueMessage' | t: { month: i18n.monthOrdinal(group.currentMonth), amount: i18n.formatCurrency(group.monthlyContribution) }"
+          [actionLabel]="'common.payNow' | t"
+          (action)="payNow()"
+        ></app-notification-banner>
+      } @else if (canDraw()) {
+        <app-notification-banner
+          variant="info"
+          icon="workspace_premium"
+          [title]="'dashboard.readyForDrawTitle' | t"
+          [message]="'dashboard.readyForDrawMessage' | t"
+          [actionLabel]="'common.startDraw' | t"
+          (action)="goToDraw()"
+        ></app-notification-banner>
+      } @else if (hasDrawnThisMonth() && m.isEligible) {
+        <app-notification-banner
+          variant="success"
+          icon="check_circle"
+          [title]="'dashboard.allSetTitle' | t"
+          [message]="'dashboard.allSetMessage' | t"
+        ></app-notification-banner>
+      } @else if (m.hasWon) {
+        <app-notification-banner
+          variant="success"
+          icon="emoji_events"
+          [title]="'dashboard.alreadyWonTitle' | t: { month: i18n.monthOrdinal(m.wonMonth || 0) }"
+          [message]="'dashboard.alreadyWonMessage' | t"
+        ></app-notification-banner>
+      }
+    }
+
+    <section>
+      <app-section-header
+        [title]="'dashboard.overviewTitle' | t"
+        [subtitle]="'dashboard.overviewSubtitle' | t"
+      ></app-section-header>
+      <div class="summary-grid">
+        <app-summary-card
+          icon="payments"
+          [label]="'dashboard.monthlyContribution' | t"
+          [value]="i18n.formatCurrency(group.monthlyContribution)"
+          accent="primary"
+        ></app-summary-card>
+        <app-summary-card
+          icon="groups"
+          [label]="'dashboard.membersJoined' | t"
+          [value]="group.members.length + ' / ' + group.totalMembers"
+          [sub]="'dashboard.seatsOpen' | t: { count: group.totalMembers - group.members.length }"
+          accent="mint"
+        ></app-summary-card>
+        <app-summary-card
+          icon="savings"
+          [label]="'dashboard.currentPrizePot' | t"
+          [value]="i18n.formatCurrency(pot())"
+          [sub]="'dashboard.guaranteedByBank' | t"
+          accent="gold"
+        ></app-summary-card>
+        <app-summary-card
+          icon="looks_one"
+          [label]="'dashboard.yourPosition' | t"
+          [value]="'#' + position()"
+          [sub]="'dashboard.joinOrder' | t"
+          accent="neutral"
+        ></app-summary-card>
+        <app-summary-card
+          icon="event_available"
+          [label]="'dashboard.remainingMonths' | t"
+          [value]="remainingMonths() + ''"
+          [sub]="'dashboard.untilComplete' | t"
+          accent="primary"
+        ></app-summary-card>
+        <app-summary-card
+          icon="fact_check"
+          [label]="'dashboard.paidThisMonth' | t"
+          [value]="paidCount() + ' / ' + group.members.length"
+          [sub]="'dashboard.contributionsCollected' | t"
+          accent="mint"
+        ></app-summary-card>
+      </div>
+    </section>
+
+    <section class="status-row">
+      <div class="status-card">
+        <span class="status-card__label">{{ 'dashboard.yourPaymentStatus' | t }}</span>
+        @if (paymentStatus(); as p) {
+          <app-status-chip [variant]="p.variant" [label]="p.labelKey | t" [icon]="p.icon"></app-status-chip>
+        }
+      </div>
+      <div class="status-card">
+        <span class="status-card__label">{{ 'dashboard.yourEligibility' | t }}</span>
+        @if (eligibility(); as e) {
+          <app-status-chip [variant]="e.variant" [label]="e.labelKey | t" [icon]="e.icon"></app-status-chip>
+        }
+      </div>
+      <div class="status-card status-card--members">
+        <span class="status-card__label">{{ 'dashboard.members' | t }}</span>
+        <div class="status-card__avatars">
+          @for (m of group.members; track m.id) {
+            <app-member-avatar
+              [initials]="m.avatarInitials"
+              [color]="m.avatarColor"
+              [size]="30"
+              [badge]="m.hasWon ? 'winner' : null"
+            ></app-member-avatar>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="actions-row">
+      @if (member()?.currentPaymentStatus === 'pending') {
+        <button type="button" class="btn btn--primary btn--lg" (click)="payNow()">
+          <mat-icon aria-hidden="true">payments</mat-icon>
+          {{ 'common.payNow' | t }}
+        </button>
+      } @else if (canDraw()) {
+        <button type="button" class="btn btn--primary btn--lg" (click)="goToDraw()">
+          <mat-icon aria-hidden="true">workspace_premium</mat-icon>
+          {{ 'common.startDraw' | t }}
+        </button>
+      }
+      <a class="btn btn--secondary btn--lg" routerLink="/group">
+        <mat-icon aria-hidden="true">groups</mat-icon>
+        {{ 'common.viewGroup' | t }}
+      </a>
+      <a class="btn btn--ghost btn--lg" routerLink="/join-group">
+        <mat-icon aria-hidden="true">travel_explore</mat-icon>
+        {{ 'common.joinAnotherGroup' | t }}
+      </a>
+    </section>
+  } @else {
+    <app-empty-state
+      icon="groups"
+      [title]="'dashboard.noGroupTitle' | t"
+      [message]="'dashboard.noGroupMessage' | t"
+    >
+      <div class="actions-row">
+        <a class="btn btn--primary" routerLink="/create-group">{{ 'common.createAGroup' | t }}</a>
+        <a class="btn btn--secondary" routerLink="/join-group">{{ 'common.joinAGroup' | t }}</a>
+      </div>
+    </app-empty-state>
+  }
+</div>

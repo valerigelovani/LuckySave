@@ -1,0 +1,20 @@
+<div class="timeline-item" [class.timeline-item--last]="isLast">
+  <div class="timeline-item__rail">
+    <span class="timeline-item__dot" [class]="'timeline-item__dot--' + variant">
+      <mat-icon aria-hidden="true">{{ icon }}</mat-icon>
+    </span>
+    @if (!isLast) {
+      <span class="timeline-item__line"></span>
+    }
+  </div>
+  <div class="timeline-item__content">
+    <div class="timeline-item__top">
+      <p class="timeline-item__title">{{ title }}</p>
+      @if (amountLabel) {
+        <span class="timeline-item__amount">{{ amountLabel }}</span>
+      }
+    </div>
+    <p class="timeline-item__description">{{ description }}</p>
+    <span class="timeline-item__meta">{{ meta }}</span>
+  </div>
+</div>

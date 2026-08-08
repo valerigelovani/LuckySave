@@ -1,0 +1,161 @@
+<div class="page create-group-page">
+  @if (createdGroup(); as g) {
+    <section class="success-card">
+      <div class="success-card__icon">
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+      </div>
+      <h1 class="success-card__title">{{ 'createGroup.successTitle' | t: { name: g.name } }}</h1>
+      <p class="success-card__subtitle">
+        {{ 'createGroup.successSubtitle' | t: { count: g.totalMembers - g.members.length } }}
+      </p>
+
+      <div class="success-card__stats">
+        <div>
+          <span>{{ 'createGroup.monthlyContributionStat' | t }}</span>
+          <strong>{{ i18n.formatCurrency(g.monthlyContribution) }}</strong>
+        </div>
+        <div>
+          <span>{{ 'createGroup.membersStat' | t }}</span>
+          <strong>{{ g.members.length }} / {{ g.totalMembers }}</strong>
+        </div>
+        <div>
+          <span>{{ 'createGroup.durationStat' | t }}</span>
+          <strong>{{ 'createGroup.durationMonths' | t: { count: g.durationMonths } }}</strong>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button type="button" class="btn btn--primary btn--lg" (click)="goToGroup()">
+          <mat-icon aria-hidden="true">home</mat-icon>
+          {{ 'common.goToMyDashboard' | t }}
+        </button>
+        <button type="button" class="btn btn--secondary btn--lg" (click)="createAnother()">
+          {{ 'common.createAnotherGroup' | t }}
+        </button>
+      </div>
+    </section>
+  } @else {
+    <header class="page-header">
+      <div>
+        <p class="page-header__eyebrow">{{ 'createGroup.eyebrow' | t }}</p>
+        <h1 class="page-header__title">{{ 'createGroup.title' | t }}</h1>
+        <p class="page-header__subtitle">{{ 'createGroup.subtitle' | t }}</p>
+      </div>
+    </header>
+
+    <div class="create-layout">
+      <form class="card create-form" [formGroup]="form" (ngSubmit)="submit()">
+        <app-section-header [eyebrow]="'createGroup.basics' | t" [title]="'createGroup.nameYourGroup' | t"></app-section-header>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'createGroup.groupNameLabel' | t }}</mat-label>
+          <input matInput formControlName="name" [placeholder]="'createGroup.groupNamePlaceholder' | t" maxlength="40" />
+          @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+            <mat-error>{{ 'createGroup.nameRequired' | t }}</mat-error>
+          }
+          @if (form.controls.name.touched && form.controls.name.hasError('minlength')) {
+            <mat-error>{{ 'createGroup.nameMinLength' | t }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'createGroup.descriptionLabel' | t }}</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+            maxlength="240"
+            [placeholder]="'createGroup.descriptionPlaceholder' | t"
+          ></textarea>
+          <mat-hint align="end">{{ form.controls.description.value.length || 0 }} / 240</mat-hint>
+        </mat-form-field>
+
+        <app-section-header [eyebrow]="'createGroup.terms' | t" [title]="'createGroup.contributionSize' | t"></app-section-header>
+
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'createGroup.monthlyContributionLabel' | t }}</mat-label>
+            <span matTextPrefix>{{ i18n.currencySymbol() }}&nbsp;</span>
+            <input matInput type="number" formControlName="monthlyContribution" min="10" max="5000" />
+            @if (form.controls.monthlyContribution.touched && form.controls.monthlyContribution.invalid) {
+              <mat-error>{{ 'createGroup.contributionError' | t: { min: i18n.formatCurrency(10), max: i18n.formatCurrency(5000) } }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'createGroup.numberOfMembersLabel' | t }}</mat-label>
+            <input matInput type="number" formControlName="totalMembers" min="2" max="20" />
+            @if (form.controls.totalMembers.touched && form.controls.totalMembers.invalid) {
+              <mat-error>{{ 'createGroup.membersError' | t }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'createGroup.durationLabel' | t }}</mat-label>
+            <input matInput type="number" formControlName="durationMonths" min="2" max="24" />
+            @if (form.controls.durationMonths.touched && form.controls.durationMonths.invalid) {
+              <mat-error>{{ 'createGroup.durationError' | t }}</mat-error>
+            }
+            <mat-hint>{{ 'createGroup.durationHint' | t }}</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <app-section-header [eyebrow]="'createGroup.settings' | t" [title]="'createGroup.groupRules' | t"></app-section-header>
+
+        <div class="toggle-row">
+          <div>
+            <p class="toggle-row__title">{{ 'createGroup.privateGroupTitle' | t }}</p>
+            <p class="toggle-row__sub">{{ 'createGroup.privateGroupSub' | t }}</p>
+          </div>
+          <mat-slide-toggle formControlName="isPrivate"></mat-slide-toggle>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <p class="toggle-row__title">{{ 'createGroup.autoDrawTitle' | t }}</p>
+            <p class="toggle-row__sub">{{ 'createGroup.autoDrawSub' | t }}</p>
+          </div>
+          <mat-slide-toggle formControlName="autoRandomDraw"></mat-slide-toggle>
+        </div>
+
+        <div class="actions-row create-form__actions">
+          <button type="submit" class="btn btn--primary btn--lg">
+            <mat-icon aria-hidden="true">add_circle</mat-icon>
+            {{ 'createGroup.createGroupBtn' | t }}
+          </button>
+          <a routerLink="/dashboard" class="btn btn--ghost btn--lg">{{ 'common.cancel' | t }}</a>
+        </div>
+      </form>
+
+      <aside class="card preview-card">
+        <span class="preview-card__eyebrow">{{ 'createGroup.livePreview' | t }}</span>
+        <h3 class="preview-card__name">{{ form.controls.name.value || ('createGroup.previewNamePlaceholder' | t) }}</h3>
+        <p class="preview-card__desc">{{ form.controls.description.value || ('createGroup.previewDescPlaceholder' | t) }}</p>
+
+        <div class="preview-card__pot">
+          <span>{{ 'createGroup.estimatedPot' | t }}</span>
+          <strong>{{ i18n.formatCurrency(pot) }}</strong>
+        </div>
+
+        <ul class="preview-card__list">
+          <li>
+            <mat-icon aria-hidden="true">payments</mat-icon>
+            {{ 'createGroup.perMemberPerMonth' | t: { amount: i18n.formatCurrency(form.controls.monthlyContribution.value || 0) } }}
+          </li>
+          <li>
+            <mat-icon aria-hidden="true">groups</mat-icon>
+            {{ 'createGroup.membersTotal' | t: { count: form.controls.totalMembers.value || 0 } }}
+          </li>
+          <li>
+            <mat-icon aria-hidden="true">event_repeat</mat-icon>
+            {{ 'createGroup.runsFor' | t: { count: form.controls.durationMonths.value || 0 } }}
+          </li>
+          <li>
+            <mat-icon aria-hidden="true">{{ form.controls.isPrivate.value ? 'lock' : 'public' }}</mat-icon>
+            {{ (form.controls.isPrivate.value ? 'createGroup.privateInviteOnly' : 'createGroup.publicOpen') | t }}
+          </li>
+        </ul>
+      </aside>
+    </div>
+  }
+</div>

@@ -1,0 +1,63 @@
+@use '../../../../styles/tokens';
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  border-radius: var(--ls-radius-pill);
+  white-space: nowrap;
+  line-height: 1;
+
+  mat-icon {
+    width: 15px;
+    height: 15px;
+    font-size: 15px;
+  }
+}
+
+.chip--md {
+  padding: 7px 12px;
+  font-size: 12.5px;
+}
+
+.chip--sm {
+  padding: 4px 9px;
+  font-size: 11px;
+
+  mat-icon {
+    width: 13px;
+    height: 13px;
+    font-size: 13px;
+  }
+}
+
+.chip--success {
+  background: var(--ls-mint-100);
+  color: var(--ls-mint-700);
+}
+
+.chip--warning {
+  background: var(--ls-gold-100);
+  color: #8a5a10;
+}
+
+.chip--danger {
+  background: var(--ls-coral-100);
+  color: #b52327;
+}
+
+.chip--info {
+  background: #e3edfb;
+  color: #205a9e;
+}
+
+.chip--neutral {
+  background: var(--ls-ink-100);
+  color: var(--ls-ink-500);
+}
+
+.chip--primary {
+  background: var(--ls-primary-100);
+  color: var(--ls-primary-700);
+}

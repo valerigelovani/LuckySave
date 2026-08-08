@@ -1,0 +1,118 @@
+<div class="page history-page">
+  @if (group(); as g) {
+    <header class="page-header">
+      <div>
+        <p class="page-header__eyebrow">{{ 'history.eyebrow' | t }}</p>
+        <h1 class="page-header__title">{{ g.name }}</h1>
+        <p class="page-header__subtitle">{{ 'history.subtitle' | t }}</p>
+      </div>
+      @if (myGroups().length > 1) {
+        <div class="group-switcher">
+          @for (mg of myGroups(); track mg.id) {
+            <button
+              type="button"
+              class="group-switcher__chip"
+              [class.group-switcher__chip--active]="mg.id === g.id"
+              (click)="switchGroup(mg.id)"
+            >
+              {{ mg.name }}
+            </button>
+          }
+        </div>
+      }
+    </header>
+
+    <section>
+      <app-section-header
+        [title]="'history.monthlySummaryTitle' | t"
+        [subtitle]="'history.monthlySummarySubtitle' | t"
+      ></app-section-header>
+
+      <div class="month-grid">
+        @for (m of monthlyDigest(); track m.month) {
+          <div class="month-card" [class.month-card--current]="m.isCurrent">
+            <div class="month-card__head">
+              <span class="month-card__label">{{ 'history.month' | t: { n: i18n.monthOrdinal(m.month) } }}</span>
+              @if (m.isCurrent) {
+                <span class="month-card__badge">{{ 'history.inProgress' | t }}</span>
+              }
+            </div>
+
+            @if (m.draw; as d) {
+              <div class="month-card__winner">
+                <app-member-avatar [initials]="d.winnerInitials" [color]="d.winnerColor" [size]="40"></app-member-avatar>
+                <div>
+                  <p class="month-card__winner-name">{{ d.winnerName }}</p>
+                  <p class="month-card__winner-sub">{{ 'history.wonAmountOn' | t: { amount: i18n.formatCurrency(d.prizeAmount), date: i18n.formatDate(d.drawDate) } }}</p>
+                </div>
+              </div>
+            } @else {
+              <p class="month-card__pending">{{ 'history.drawNotCompleted' | t }}</p>
+            }
+
+            <div class="month-card__meta">
+              <span>
+                <mat-icon aria-hidden="true">fact_check</mat-icon>
+                {{ 'history.paidOf' | t: { paid: m.paidCount, total: m.totalMembers } }}
+              </span>
+              @if (m.loans.length > 0) {
+                <span class="month-card__meta--warn">
+                  <mat-icon aria-hidden="true">account_balance</mat-icon>
+                  {{ 'history.bankCoverageCount' | t: { count: m.loans.length } }}
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section>
+      <app-section-header [title]="'history.activityTimelineTitle' | t" [subtitle]="'history.activityTimelineSubtitle' | t"></app-section-header>
+
+      <div class="filter-row">
+        @for (f of filters; track f.key) {
+          <button
+            type="button"
+            class="filter-chip"
+            [class.filter-chip--active]="filter() === f.key"
+            (click)="setFilter(f.key)"
+          >
+            {{ f.labelKey | t }}
+          </button>
+        }
+      </div>
+
+      @if (filteredHistory().length > 0) {
+        <div class="card timeline-card">
+          @for (item of filteredHistory(); track item.id; let last = $last) {
+            <app-timeline-item
+              [icon]="historyIcon(item.type).icon"
+              [variant]="historyIcon(item.type).variant"
+              [title]="i18n.tHistoryTitle(item)"
+              [description]="i18n.tHistoryDescription(item)"
+              [meta]="i18n.formatDate(item.timestamp)"
+              [amountLabel]="item.amount ? i18n.formatCurrency(item.amount) : ''"
+              [isLast]="last"
+            ></app-timeline-item>
+          }
+        </div>
+      } @else {
+        <div class="card">
+          <app-empty-state icon="history" [title]="'history.noEventsTitle' | t" [message]="'history.noEventsMessage' | t"></app-empty-state>
+        </div>
+      }
+    </section>
+  } @else {
+    <app-empty-state
+      icon="history"
+      [title]="'history.noGroupTitle' | t"
+      [message]="'history.noGroupMessage' | t"
+    >
+      <div class="actions-row">
+        <a class="btn btn--primary" routerLink="/create-group">{{ 'common.createAGroup' | t }}</a>
+        <a class="btn btn--secondary" routerLink="/join-group">{{ 'common.joinAGroup' | t }}</a>
+      </div>
+    </app-empty-state>
+  }
+</div>

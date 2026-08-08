@@ -1,0 +1,86 @@
+<div class="page join-group-page">
+  <header class="page-header">
+    <div>
+      <p class="page-header__eyebrow">{{ 'joinGroup.eyebrow' | t }}</p>
+      <h1 class="page-header__title">{{ 'joinGroup.title' | t }}</h1>
+      <p class="page-header__subtitle">{{ 'joinGroup.subtitle' | t }}</p>
+    </div>
+    <a routerLink="/create-group" class="btn btn--secondary">
+      <mat-icon aria-hidden="true">add_circle</mat-icon>
+      {{ 'common.createYourOwn' | t }}
+    </a>
+  </header>
+
+  @if (joinableGroups().length > 0) {
+    <div class="join-grid">
+      @for (g of joinableGroups(); track g.id) {
+        <div class="join-card">
+          <div class="join-card__head">
+            <div>
+              <h3 class="join-card__name">{{ g.name }}</h3>
+              <p class="join-card__desc">{{ g.description }}</p>
+            </div>
+            @if (g.isPrivate) {
+              <mat-icon class="join-card__lock" aria-hidden="true" [title]="'createGroup.privateGroupTitle' | t">lock</mat-icon>
+            }
+          </div>
+
+          <div class="join-card__avatars">
+            @for (m of g.members.slice(0, 6); track m.id) {
+              <app-member-avatar [initials]="m.avatarInitials" [color]="m.avatarColor" [size]="30"></app-member-avatar>
+            }
+            @if (g.members.length > 6) {
+              <span class="join-card__more">+{{ g.members.length - 6 }}</span>
+            }
+          </div>
+
+          <div class="join-card__progress">
+            <div class="progress-bar">
+              <div class="progress-bar__fill progress-bar__fill--mint" [style.width.%]="fillRatio(g)"></div>
+            </div>
+            <span>{{ 'joinGroup.filled' | t: { joined: g.members.length, total: g.totalMembers } }}</span>
+          </div>
+
+          <div class="join-card__stats">
+            <div>
+              <span>{{ 'joinGroup.monthly' | t }}</span>
+              <strong>{{ i18n.formatCurrency(g.monthlyContribution) }}</strong>
+            </div>
+            <div>
+              <span>{{ 'joinGroup.estPot' | t }}</span>
+              <strong>{{ i18n.formatCurrency(estimatedPot(g)) }}</strong>
+            </div>
+            <div>
+              <span>{{ 'joinGroup.nextDraw' | t }}</span>
+              <strong>{{ i18n.formatDate(g.nextDrawDate) }}</strong>
+            </div>
+            <div>
+              <span>{{ 'joinGroup.seatsLeft' | t }}</span>
+              <strong>{{ seatsRemaining(g) }}</strong>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn--block"
+            [class.btn--primary]="seatsRemaining(g) > 0"
+            [class.btn--secondary]="seatsRemaining(g) === 0"
+            [disabled]="seatsRemaining(g) === 0"
+            (click)="join(g)"
+          >
+            <mat-icon aria-hidden="true">{{ seatsRemaining(g) > 0 ? 'group_add' : 'block' }}</mat-icon>
+            {{ (seatsRemaining(g) > 0 ? 'common.joinThisGroup' : 'common.groupIsFull') | t }}
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <app-empty-state
+      icon="travel_explore"
+      [title]="'joinGroup.noGroupsTitle' | t"
+      [message]="'joinGroup.noGroupsMessage' | t"
+    >
+      <a class="btn btn--primary" routerLink="/create-group">{{ 'common.createAGroup' | t }}</a>
+    </app-empty-state>
+  }
+</div>
