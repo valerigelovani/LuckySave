@@ -2,6 +2,7 @@ import { Injectable, computed, inject } from '@angular/core';
 import { Group, GroupMember, HistoryItem } from '../core/models';
 import { addDays } from '../core/utils/date.util';
 import { createId } from '../core/utils/id.util';
+import { shuffle } from '../core/utils/shuffle.util';
 import { CURRENT_USER_ID } from '../core/constants/app.constants';
 import { StoreService } from './store.service';
 import { ToastService } from './toast.service';
@@ -61,6 +62,15 @@ export class GroupService {
 
   currentUserMember(group: Group): GroupMember | undefined {
     return group.members.find((m) => m.userId === CURRENT_USER_ID);
+  }
+
+  scheduledMemberId(group: Group, month: number): string | undefined {
+    return group.payoutOrder[month - 1];
+  }
+
+  scheduledMonthForMember(group: Group, memberId: string): number | undefined {
+    const index = group.payoutOrder.indexOf(memberId);
+    return index === -1 ? undefined : index + 1;
   }
 
   createGroup(payload: CreateGroupPayload): Group {
@@ -126,6 +136,7 @@ export class GroupService {
       draws: [],
       loans: [],
       history,
+      payoutOrder: status === 'active' ? [founder.id] : [],
     };
 
     this.store.addGroup(group);
@@ -184,6 +195,7 @@ export class GroupService {
         ...g,
         members,
         status: willBeFull ? 'active' : g.status,
+        payoutOrder: willBeFull ? shuffle(members.map((m) => m.id)) : g.payoutOrder,
         history: [historyEntry, ...g.history],
       };
     });

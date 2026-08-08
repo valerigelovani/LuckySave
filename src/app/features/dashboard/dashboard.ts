@@ -54,14 +54,11 @@ export class Dashboard {
     return group ? this.groupService.currentUserMember(group) : undefined;
   });
 
-  position = computed(() => {
+  payoutMonth = computed<number | undefined>(() => {
     const group = this.activeGroup();
     const m = this.member();
-    if (!group || !m) return 0;
-    const sorted = [...group.members].sort(
-      (a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime(),
-    );
-    return sorted.findIndex((x) => x.id === m.id) + 1;
+    if (!group || !m) return undefined;
+    return this.groupService.scheduledMonthForMember(group, m.id);
   });
 
   pot = computed(() => {

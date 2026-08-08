@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { DrawResult, Group, GroupMember, HistoryItem, Payment } from '../core/models';
 import { addDays } from '../core/utils/date.util';
 import { createId } from '../core/utils/id.util';
+import { shuffle } from '../core/utils/shuffle.util';
 import { StoreService } from './store.service';
 import { ToastService } from './toast.service';
 import { I18nService } from './i18n.service';
@@ -24,11 +25,21 @@ export class DrawService {
     return group.status === 'active' && !this.hasDrawnThisMonth(group) && this.eligibleMembers(group).length > 0;
   }
 
-  pickRandomWinner(group: Group): GroupMember | null {
+  /**
+   * The whole payout order is fixed the moment the group fills up (see
+   * GroupService.joinGroup), so this looks up who's already scheduled for
+   * the current month rather than picking someone fresh. Falls back to a
+   * one-off shuffle only if a group somehow has no schedule yet.
+   */
+  scheduledWinner(group: Group): GroupMember | null {
     const eligible = this.eligibleMembers(group);
     if (eligible.length === 0) return null;
-    const index = Math.floor(Math.random() * eligible.length);
-    return eligible[index];
+
+    const scheduledId = group.payoutOrder[group.currentMonth - 1];
+    const scheduled = eligible.find((m) => m.id === scheduledId);
+    if (scheduled) return scheduled;
+
+    return shuffle(eligible)[0];
   }
 
   commitDraw(groupId: string, winnerId: string): DrawResult | null {

@@ -213,6 +213,7 @@ function buildFamilyCircle(): Group {
     draws,
     loans,
     history,
+    payoutOrder: [priya.id, james.id, luka.id, sara.id, diego.id, emma.id],
   };
 }
 
@@ -276,6 +277,7 @@ function buildOfficeSquad(): Group {
     draws,
     loans: [],
     history,
+    payoutOrder: [marta.id, noah.id, luka.id, grace.id],
   };
 }
 
@@ -318,6 +320,7 @@ function buildOpenGroup(config: {
     draws: [],
     loans: [],
     history,
+    payoutOrder: [],
   };
 }
 

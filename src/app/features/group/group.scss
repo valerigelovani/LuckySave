@@ -100,6 +100,51 @@
   justify-content: flex-end;
 }
 
+.schedule-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--ls-space-3);
+}
+
+.schedule-row {
+  @include mixins.card-surface;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ls-space-2);
+  padding: var(--ls-space-3) var(--ls-space-4);
+}
+
+.schedule-row--current {
+  border-color: var(--ls-primary-300);
+  box-shadow: 0 0 0 3px var(--ls-primary-50);
+}
+
+.schedule-row__month {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--ls-ink-300);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.schedule-row__member {
+  display: flex;
+  align-items: center;
+  gap: var(--ls-space-3);
+  width: 100%;
+}
+
+.schedule-row__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .group-page__split {
   display: grid;
   grid-template-columns: 1fr;

@@ -84,6 +84,48 @@
       </div>
     </section>
 
+    <section>
+      <app-section-header
+        [title]="'group.scheduleTitle' | t"
+        [subtitle]="'group.scheduleSubtitle' | t"
+      ></app-section-header>
+
+      @if (payoutSchedule().length > 0) {
+        <div class="schedule-list">
+          @for (row of payoutSchedule(); track row.month) {
+            <div class="schedule-row" [class.schedule-row--current]="row.state === 'current'">
+              <span class="schedule-row__month">{{ 'history.month' | t: { n: i18n.monthOrdinal(row.month) } }}</span>
+              <div class="schedule-row__member">
+                @if (row.member; as m) {
+                  <app-member-avatar
+                    [initials]="m.avatarInitials"
+                    [color]="m.avatarColor"
+                    [size]="36"
+                    [badge]="m.isCurrentUser ? 'you' : null"
+                  ></app-member-avatar>
+                  <span class="schedule-row__name">{{ m.name }}</span>
+                }
+              </div>
+              <app-status-chip
+                size="sm"
+                [variant]="scheduleStateChip(row.state).variant"
+                [label]="scheduleStateChip(row.state).labelKey | t"
+                [icon]="scheduleStateChip(row.state).icon"
+              ></app-status-chip>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="card">
+          <app-empty-state
+            icon="event_repeat"
+            [title]="'group.scheduleNotReadyTitle' | t"
+            [message]="'group.scheduleNotReadyMessage' | t"
+          ></app-empty-state>
+        </div>
+      }
+    </section>
+
     <div class="group-page__split">
       <section>
         <app-section-header

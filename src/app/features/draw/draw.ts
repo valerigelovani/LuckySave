@@ -94,7 +94,7 @@ export class DrawPage implements OnDestroy {
     const group = this.group();
     if (!group || !this.canDraw()) return;
 
-    const winnerMember = this.drawService.pickRandomWinner(group);
+    const winnerMember = this.drawService.scheduledWinner(group);
     if (!winnerMember) return;
 
     this.winner.set(null);

@@ -113,7 +113,7 @@
         <app-summary-card
           icon="looks_one"
           [label]="'dashboard.yourPosition' | t"
-          [value]="'#' + position()"
+          [value]="payoutMonth() ? ('history.month' | t: { n: i18n.monthOrdinal(payoutMonth()!) }) : ('dashboard.scheduleTbd' | t)"
           [sub]="'dashboard.joinOrder' | t"
           accent="neutral"
         ></app-summary-card>

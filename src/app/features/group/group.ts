@@ -57,8 +57,33 @@ export class GroupPage {
 
   drawTimeline = computed(() => [...(this.group()?.draws ?? [])].reverse());
 
+  payoutSchedule = computed(() => {
+    const g = this.group();
+    if (!g || g.payoutOrder.length === 0) return [];
+
+    return g.payoutOrder.map((memberId, index) => {
+      const month = index + 1;
+      const member = g.members.find((m) => m.id === memberId);
+      const isPaid = g.draws.some((d) => d.month === month);
+      const isCurrent = !isPaid && month === g.currentMonth && g.status === 'active';
+      const state: 'paid' | 'current' | 'upcoming' = isPaid ? 'paid' : isCurrent ? 'current' : 'upcoming';
+      return { month, member, state };
+    });
+  });
+
   groupStatusChip = groupStatusChip;
   paymentStatusChip = paymentStatusChip;
   eligibilityChip = eligibilityChip;
   historyIcon = historyIcon;
+
+  scheduleStateChip(state: 'paid' | 'current' | 'upcoming'): { variant: 'success' | 'primary' | 'neutral'; labelKey: string; icon: string } {
+    switch (state) {
+      case 'paid':
+        return { variant: 'success', labelKey: 'schedule.paidOut', icon: 'check_circle' };
+      case 'current':
+        return { variant: 'primary', labelKey: 'schedule.thisMonth', icon: 'bolt' };
+      case 'upcoming':
+        return { variant: 'neutral', labelKey: 'schedule.upcoming', icon: 'schedule' };
+    }
+  }
 }
