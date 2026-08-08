@@ -1,0 +1,129 @@
+@use '../../../styles/mixins';
+
+.dashboard {
+  @include mixins.fade-in-up;
+}
+
+.dashboard__greeting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--ls-space-4);
+}
+
+.group-switcher {
+  display: flex;
+  gap: var(--ls-space-2);
+  flex-wrap: wrap;
+}
+
+.group-switcher__chip {
+  border: 1.5px solid var(--ls-border-strong);
+  background: var(--ls-surface);
+  color: var(--ls-ink-500);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: var(--ls-radius-pill);
+  cursor: pointer;
+  transition: all var(--ls-duration-fast) var(--ls-ease);
+
+  &:hover {
+    border-color: var(--ls-primary-300);
+  }
+}
+
+.group-switcher__chip--active {
+  background: var(--ls-primary);
+  border-color: var(--ls-primary);
+  color: #fff;
+}
+
+.hero-card {
+  background: var(--ls-surface);
+  border: 1px solid var(--ls-border);
+  border-radius: var(--ls-radius-xl);
+  box-shadow: var(--ls-shadow-md);
+  padding: var(--ls-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ls-space-5);
+}
+
+.hero-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ls-space-5);
+  flex-wrap: wrap;
+}
+
+.hero-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ls-space-3);
+  flex-wrap: wrap;
+
+  h2 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+}
+
+.hero-card__code {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--ls-ink-400);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.hero-card__progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ls-ink-500);
+  margin-bottom: 8px;
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--ls-space-4);
+}
+
+.status-card {
+  background: var(--ls-surface);
+  border: 1px solid var(--ls-border);
+  border-radius: var(--ls-radius-lg);
+  padding: var(--ls-space-4) var(--ls-space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ls-space-3);
+}
+
+.status-card__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ls-ink-500);
+}
+
+.status-card--members {
+  overflow: hidden;
+}
+
+.status-card__avatars {
+  display: flex;
+
+  app-member-avatar {
+    margin-left: -8px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}

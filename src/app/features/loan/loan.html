@@ -1,0 +1,162 @@
+<div class="page loan-page">
+  @if (group(); as g) {
+    <header class="page-header">
+      <div>
+        <p class="page-header__eyebrow">Bank coverage</p>
+        <h1 class="page-header__title">Loan Coverage</h1>
+        <p class="page-header__subtitle">
+          If a member misses a contribution, the bank covers it immediately so the group's prize pot is never
+          affected. A short-term loan record tracks the balance until it's repaid.
+        </p>
+      </div>
+    </header>
+
+    @if (outstandingLoans().length > 0) {
+      <app-notification-banner
+        variant="warning"
+        icon="account_balance"
+        [title]="outstandingLoans().length + ' member(s) currently on bank coverage'"
+        message="These balances are tracked below until each member repays their loan."
+      ></app-notification-banner>
+    }
+
+    <section class="loan-simulate-card">
+      <div class="loan-simulate-card__icon">
+        <mat-icon aria-hidden="true">shield</mat-icon>
+      </div>
+      <div class="loan-simulate-card__body">
+        <p class="loan-simulate-card__title">See bank coverage in action</p>
+        @if (canSimulate()) {
+          <p class="loan-simulate-card__text">
+            Simulate what happens if your month {{ g.currentMonth }} contribution isn't paid in time — the bank
+            covers it instantly and opens a loan record in your name.
+          </p>
+        } @else {
+          <p class="loan-simulate-card__text">
+            Your month {{ g.currentMonth }} contribution is already settled, so there's nothing to cover right
+            now.
+          </p>
+        }
+      </div>
+      <button
+        type="button"
+        class="btn btn--secondary"
+        [disabled]="!canSimulate()"
+        (click)="simulateMissedPayment()"
+      >
+        <mat-icon aria-hidden="true">report</mat-icon>
+        Simulate missed payment
+      </button>
+    </section>
+
+    <section>
+      <app-section-header
+        title="Outstanding loans"
+        subtitle="Bank-covered balances still owed by members."
+      ></app-section-header>
+
+      @if (outstandingLoans().length > 0) {
+        <div class="loan-list">
+          @for (l of outstandingLoans(); track l.id) {
+            <div class="loan-row">
+              <app-member-avatar
+                [initials]="memberFor(l.memberId)?.avatarInitials ?? ''"
+                [color]="memberFor(l.memberId)?.avatarColor ?? '#5B4FE9'"
+                [size]="42"
+              ></app-member-avatar>
+              <div class="loan-row__info">
+                <p class="loan-row__name">{{ l.memberName }}</p>
+                <p class="loan-row__meta">Month {{ l.month }} · Opened {{ formatDate(l.createdAt) }}</p>
+              </div>
+              <div class="loan-row__balance">
+                <span>Remaining balance</span>
+                <strong>{{ formatCurrency(l.remainingBalance) }}</strong>
+              </div>
+              <app-status-chip variant="danger" label="Outstanding" icon="schedule"></app-status-chip>
+              <button type="button" class="btn btn--mint btn--sm" (click)="repay(l.id)">
+                <mat-icon aria-hidden="true">task_alt</mat-icon>
+                Mark repaid
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="card">
+          <app-empty-state
+            icon="verified"
+            title="No outstanding loans"
+            message="Everyone in this group is current on their contributions."
+          ></app-empty-state>
+        </div>
+      }
+    </section>
+
+    @if (repaidLoans().length > 0) {
+      <section>
+        <app-section-header title="Repaid loans" subtitle="Bank coverage that has since been settled."></app-section-header>
+        <div class="loan-list">
+          @for (l of repaidLoans(); track l.id) {
+            <div class="loan-row loan-row--settled">
+              <app-member-avatar
+                [initials]="memberFor(l.memberId)?.avatarInitials ?? ''"
+                [color]="memberFor(l.memberId)?.avatarColor ?? '#5B4FE9'"
+                [size]="42"
+              ></app-member-avatar>
+              <div class="loan-row__info">
+                <p class="loan-row__name">{{ l.memberName }}</p>
+                <p class="loan-row__meta">Month {{ l.month }} · Repaid {{ l.repaidAt ? formatDate(l.repaidAt) : '' }}</p>
+              </div>
+              <div class="loan-row__balance">
+                <span>Amount covered</span>
+                <strong>{{ formatCurrency(l.amount) }}</strong>
+              </div>
+              <app-status-chip variant="success" label="Repaid" icon="check_circle"></app-status-chip>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <section>
+      <app-section-header
+        title="Event log"
+        subtitle="Missed payments and bank coverage activity for this group."
+      ></app-section-header>
+
+      @if (loanEvents().length > 0) {
+        <div class="card timeline-card">
+          @for (item of loanEvents(); track item.id; let last = $last) {
+            <app-timeline-item
+              [icon]="historyIcon(item.type).icon"
+              [variant]="historyIcon(item.type).variant"
+              [title]="item.title"
+              [description]="item.description"
+              [meta]="formatDate(item.timestamp)"
+              [amountLabel]="item.amount ? formatCurrency(item.amount) : ''"
+              [isLast]="last"
+            ></app-timeline-item>
+          }
+        </div>
+      } @else {
+        <div class="card">
+          <app-empty-state
+            icon="history"
+            title="No events yet"
+            message="Missed payments and bank coverage activity will appear here."
+          ></app-empty-state>
+        </div>
+      }
+    </section>
+  } @else {
+    <app-empty-state
+      icon="account_balance"
+      title="No group selected"
+      message="Join or create a group to see loan coverage."
+    >
+      <div class="actions-row">
+        <a class="btn btn--primary" routerLink="/create-group">Create a group</a>
+        <a class="btn btn--secondary" routerLink="/join-group">Join a group</a>
+      </div>
+    </app-empty-state>
+  }
+</div>

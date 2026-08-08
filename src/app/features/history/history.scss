@@ -1,0 +1,159 @@
+@use '../../../styles/mixins';
+
+.history-page {
+  @include mixins.fade-in-up;
+}
+
+.group-switcher {
+  display: flex;
+  gap: var(--ls-space-2);
+  flex-wrap: wrap;
+}
+
+.group-switcher__chip {
+  border: 1.5px solid var(--ls-border-strong);
+  background: var(--ls-surface);
+  color: var(--ls-ink-500);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: var(--ls-radius-pill);
+  cursor: pointer;
+  transition: all var(--ls-duration-fast) var(--ls-ease);
+
+  &:hover {
+    border-color: var(--ls-primary-300);
+  }
+}
+
+.group-switcher__chip--active {
+  background: var(--ls-primary);
+  border-color: var(--ls-primary);
+  color: #fff;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--ls-space-4);
+}
+
+.month-card {
+  @include mixins.card-surface;
+  @include mixins.card-interactive;
+  padding: var(--ls-space-4) var(--ls-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ls-space-3);
+}
+
+.month-card--current {
+  border-color: var(--ls-primary-300);
+  box-shadow: 0 0 0 3px var(--ls-primary-50);
+}
+
+.month-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.month-card__label {
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--ls-ink);
+}
+
+.month-card__badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ls-primary);
+  background: var(--ls-primary-50);
+  padding: 2px 9px;
+  border-radius: var(--ls-radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.month-card__winner {
+  display: flex;
+  align-items: center;
+  gap: var(--ls-space-3);
+}
+
+.month-card__winner-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.month-card__winner-sub {
+  font-size: 12.5px;
+  color: var(--ls-ink-400);
+  margin-top: 1px;
+}
+
+.month-card__pending {
+  font-size: 13px;
+  color: var(--ls-ink-300);
+  font-style: italic;
+}
+
+.month-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ls-space-3);
+  padding-top: var(--ls-space-3);
+  border-top: 1px solid var(--ls-border);
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ls-ink-400);
+  }
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+}
+
+.month-card__meta--warn {
+  color: #8a5a10 !important;
+}
+
+.filter-row {
+  display: flex;
+  gap: var(--ls-space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--ls-space-5);
+}
+
+.filter-chip {
+  border: 1.5px solid var(--ls-border-strong);
+  background: var(--ls-surface);
+  color: var(--ls-ink-500);
+  font-weight: 700;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  border-radius: var(--ls-radius-pill);
+  cursor: pointer;
+  transition: all var(--ls-duration-fast) var(--ls-ease);
+
+  &:hover {
+    border-color: var(--ls-primary-300);
+  }
+}
+
+.filter-chip--active {
+  background: var(--ls-ink);
+  border-color: var(--ls-ink);
+  color: #fff;
+}
+
+.timeline-card {
+  padding: var(--ls-space-5);
+}

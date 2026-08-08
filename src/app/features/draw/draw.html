@@ -1,0 +1,175 @@
+<div class="page draw-page">
+  @if (!group()) {
+    <app-empty-state
+      icon="workspace_premium"
+      title="No group selected"
+      message="Choose a group to run its monthly draw."
+    >
+      <a class="btn btn--primary" routerLink="/dashboard">Go to dashboard</a>
+    </app-empty-state>
+  } @else {
+    <header class="page-header">
+      <div>
+        <p class="page-header__eyebrow">{{ group()!.name }}</p>
+        <h1 class="page-header__title">Monthly Draw</h1>
+        <p class="page-header__subtitle">
+          Month {{ group()!.currentMonth }} of {{ group()!.durationMonths }} — a fair, transparent selection for
+          this circle.
+        </p>
+      </div>
+      <app-countdown-display [targetDate]="group()!.nextDrawDate" label="Next draw window"></app-countdown-display>
+    </header>
+
+    @if (phase() === 'spinning') {
+      <section class="draw-stage draw-stage--spinning">
+        <p class="draw-stage__eyebrow">Selecting this month's winner…</p>
+        @for (n of [spinTick()]; track n) {
+          <div class="slot-card">
+            <app-member-avatar
+              [initials]="spinMember()?.avatarInitials ?? ''"
+              [color]="spinMember()?.avatarColor ?? '#5B4FE9'"
+              [size]="96"
+            ></app-member-avatar>
+            <p class="slot-card__name">{{ spinMember()?.name }}</p>
+          </div>
+        }
+        <p class="draw-stage__hint">
+          <mat-icon aria-hidden="true">verified_user</mat-icon>
+          Every eligible member has an equal chance — hold tight.
+        </p>
+      </section>
+    } @else if (phase() === 'revealed' && winner(); as w) {
+      <section class="draw-stage draw-stage--revealed">
+        <div class="confetti-layer" aria-hidden="true">
+          @for (p of confetti(); track p.id) {
+            <span
+              class="confetti-piece"
+              [style.left.%]="p.left"
+              [style.background]="p.color"
+              [style.animationDelay.ms]="p.delay"
+              [style.animationDuration.ms]="p.duration"
+              [style.width.px]="p.size"
+              [style.height.px]="p.size * 2.6"
+              [style.transform]="'rotate(' + p.rotation + 'deg)'"
+            ></span>
+          }
+        </div>
+
+        <span class="winner-card__label">
+          <mat-icon aria-hidden="true">emoji_events</mat-icon>
+          This month's winner
+        </span>
+        <app-member-avatar
+          [initials]="w.avatarInitials"
+          [color]="w.avatarColor"
+          [size]="112"
+          [ring]="true"
+        ></app-member-avatar>
+        <h2 class="winner-card__name">{{ w.name }}</h2>
+        <p class="winner-card__prize">{{ formatCurrency(prizeAmount()) }}</p>
+        <p class="winner-card__note">
+          <mat-icon aria-hidden="true">lock</mat-icon>
+          {{ w.name }} is now locked out of future draws in this circle.
+        </p>
+
+        <div class="actions-row">
+          <a class="btn btn--primary btn--lg" routerLink="/group">
+            <mat-icon aria-hidden="true">groups</mat-icon>
+            View group
+          </a>
+          <a class="btn btn--secondary btn--lg" routerLink="/history">
+            <mat-icon aria-hidden="true">history</mat-icon>
+            View history
+          </a>
+        </div>
+      </section>
+    } @else if (isCompleted()) {
+      <app-empty-state
+        icon="task_alt"
+        title="This circle has finished"
+        message="Every member has already received their payout. Thanks for saving together."
+      >
+        <a class="btn btn--primary" routerLink="/history">View full history</a>
+      </app-empty-state>
+    } @else if (hasDrawnThisMonth() && thisMonthResult(); as r) {
+      <section class="draw-stage draw-stage--settled">
+        <span class="winner-card__label">
+          <mat-icon aria-hidden="true">emoji_events</mat-icon>
+          Month {{ r.month }} winner
+        </span>
+        <app-member-avatar
+          [initials]="r.winnerInitials"
+          [color]="r.winnerColor"
+          [size]="96"
+          [ring]="true"
+        ></app-member-avatar>
+        <h2 class="winner-card__name">{{ r.winnerName }}</h2>
+        <p class="winner-card__prize">{{ formatCurrency(r.prizeAmount) }}</p>
+        <p class="winner-card__note">This month's draw is complete. Check back before the next one opens.</p>
+        <div class="actions-row">
+          <a class="btn btn--secondary btn--lg" routerLink="/group">View group</a>
+          <a class="btn btn--ghost btn--lg" routerLink="/history">View history</a>
+        </div>
+      </section>
+    } @else {
+      <section class="draw-intro">
+        <div class="pot-banner">
+          <span class="pot-banner__label">Prize pot for month {{ group()!.currentMonth }}</span>
+          <span class="pot-banner__amount">{{ formatCurrency(prizeAmount()) }}</span>
+          <span class="pot-banner__sub">Guaranteed by the bank, regardless of individual payment timing.</span>
+        </div>
+
+        <div class="fairness-note">
+          <mat-icon aria-hidden="true">verified_user</mat-icon>
+          <div>
+            <p class="fairness-note__title">A fair, transparent process</p>
+            <p class="fairness-note__text">
+              Every eligible member has an exactly equal chance of being selected. Members who have already won
+              are automatically excluded — no one can win twice.
+            </p>
+          </div>
+        </div>
+
+        <app-section-header
+          title="Eligible this month"
+          [subtitle]="eligible().length + ' member(s) can be selected in this draw'"
+        ></app-section-header>
+
+        <div class="eligible-grid">
+          @for (m of eligible(); track m.id) {
+            <div class="eligible-chip">
+              <app-member-avatar
+                [initials]="m.avatarInitials"
+                [color]="m.avatarColor"
+                [size]="48"
+                [badge]="m.isCurrentUser ? 'you' : null"
+              ></app-member-avatar>
+              <span>{{ m.name }}</span>
+            </div>
+          }
+        </div>
+
+        @if (ineligible().length > 0) {
+          <div class="ineligible-row">
+            <span class="ineligible-row__label">Already won — excluded from this draw</span>
+            <div class="ineligible-row__avatars">
+              @for (m of ineligible(); track m.id) {
+                <app-member-avatar [initials]="m.avatarInitials" [color]="m.avatarColor" [size]="30"></app-member-avatar>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="actions-row">
+          <button type="button" class="btn btn--primary btn--lg" [disabled]="!canDraw()" (click)="startDraw()">
+            <mat-icon aria-hidden="true">workspace_premium</mat-icon>
+            Start draw
+          </button>
+        </div>
+        @if (blockedReason()) {
+          <p class="draw-blocked-reason">{{ blockedReason() }}</p>
+        }
+      </section>
+    }
+  }
+</div>

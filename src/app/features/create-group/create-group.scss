@@ -1,0 +1,227 @@
+@use '../../../styles/mixins';
+
+.create-group-page {
+  @include mixins.fade-in-up;
+}
+
+.create-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ls-space-6);
+  align-items: start;
+
+  @media (min-width: 960px) {
+    grid-template-columns: 1.6fr 1fr;
+  }
+}
+
+.create-form {
+  padding: var(--ls-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ls-space-4);
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--ls-space-3) var(--ls-space-4);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ls-space-4);
+  padding: var(--ls-space-3) var(--ls-space-4);
+  border-radius: var(--ls-radius-md);
+  background: var(--ls-surface-sunken);
+}
+
+.toggle-row__title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.toggle-row__sub {
+  font-size: 12.5px;
+  color: var(--ls-ink-400);
+  margin-top: 1px;
+}
+
+.create-form__actions {
+  margin-top: var(--ls-space-2);
+}
+
+.preview-card {
+  padding: var(--ls-space-6);
+  position: sticky;
+  top: var(--ls-space-6);
+  background: linear-gradient(160deg, var(--ls-primary-50), var(--ls-surface) 55%);
+}
+
+.preview-card__eyebrow {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ls-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.preview-card__name {
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ls-ink);
+  word-break: break-word;
+}
+
+.preview-card__desc {
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: var(--ls-ink-400);
+  line-height: 1.5;
+}
+
+.preview-card__pot {
+  margin-top: var(--ls-space-5);
+  padding: var(--ls-space-4);
+  border-radius: var(--ls-radius-lg);
+  background: var(--ls-surface);
+  border: 1px solid var(--ls-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  span {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ls-ink-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  strong {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--ls-mint-700);
+  }
+}
+
+.preview-card__list {
+  margin-top: var(--ls-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ls-space-3);
+  list-style: none;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--ls-ink-500);
+    font-weight: 600;
+  }
+
+  mat-icon {
+    color: var(--ls-primary);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+// ---------- Success state ----------
+.success-card {
+  @include mixins.fade-in-up;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--ls-space-3);
+  padding: var(--ls-space-8) var(--ls-space-5);
+  border-radius: var(--ls-radius-xl);
+  background: var(--ls-surface);
+  border: 1px solid var(--ls-border);
+  box-shadow: var(--ls-shadow-md);
+}
+
+.success-card__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ls-mint-100);
+  color: var(--ls-mint-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--ls-space-2);
+  animation: winner-pop 480ms var(--ls-ease) both;
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@keyframes winner-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  70% {
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.success-card__title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.success-card__subtitle {
+  font-size: 14px;
+  color: var(--ls-ink-400);
+  max-width: 48ch;
+}
+
+.success-card__stats {
+  display: flex;
+  gap: var(--ls-space-6);
+  margin-top: var(--ls-space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  span {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--ls-ink-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  strong {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--ls-ink);
+  }
+}

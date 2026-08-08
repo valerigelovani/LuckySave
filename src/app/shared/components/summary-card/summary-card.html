@@ -1,0 +1,12 @@
+<div class="summary-card" [class]="'summary-card--' + accent">
+  <div class="summary-card__icon">
+    <mat-icon aria-hidden="true">{{ icon }}</mat-icon>
+  </div>
+  <div class="summary-card__body">
+    <span class="summary-card__label">{{ label }}</span>
+    <span class="summary-card__value">{{ value }}</span>
+    @if (sub) {
+      <span class="summary-card__sub">{{ sub }}</span>
+    }
+  </div>
+</div>

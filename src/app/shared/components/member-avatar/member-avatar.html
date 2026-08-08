@@ -1,0 +1,18 @@
+<span
+  class="avatar"
+  [class.avatar--ring]="ring"
+  [style.width.px]="size"
+  [style.height.px]="size"
+  [style.background]="color"
+  [style.fontSize.px]="size * 0.38"
+>
+  {{ initials }}
+  @if (badge === 'winner') {
+    <span class="avatar__badge avatar__badge--winner" title="Already won">
+      <mat-icon aria-hidden="true">emoji_events</mat-icon>
+    </span>
+  }
+  @if (badge === 'you') {
+    <span class="avatar__badge avatar__badge--you">You</span>
+  }
+</span>

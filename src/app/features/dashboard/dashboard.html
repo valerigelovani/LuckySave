@@ -1,0 +1,198 @@
+<div class="page dashboard">
+  @if (activeGroup(); as group) {
+    <header class="dashboard__greeting">
+      <div>
+        <p class="page-header__eyebrow">Welcome back</p>
+        <h1 class="page-header__title">Hi, {{ currentUser().name.split(' ')[0] }}</h1>
+        <p class="page-header__subtitle">Here's where things stand with your savings circle today.</p>
+      </div>
+
+      @if (myGroups().length > 1) {
+        <div class="group-switcher">
+          @for (g of myGroups(); track g.id) {
+            <button
+              type="button"
+              class="group-switcher__chip"
+              [class.group-switcher__chip--active]="g.id === group.id"
+              (click)="switchGroup(g.id)"
+            >
+              {{ g.name }}
+            </button>
+          }
+        </div>
+      }
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-card__top">
+        <div class="hero-card__identity">
+          <div class="hero-card__title-row">
+            <h2>{{ group.name }}</h2>
+            @if (groupStatus(); as s) {
+              <app-status-chip [variant]="s.variant" [label]="s.label" [icon]="s.icon"></app-status-chip>
+            }
+          </div>
+          <p class="hero-card__code">Group ID · {{ code() }}</p>
+        </div>
+        <app-countdown-display [targetDate]="group.nextDrawDate" label="Next draw"></app-countdown-display>
+      </div>
+
+      <div class="hero-card__progress">
+        <div class="hero-card__progress-labels">
+          <span>Month {{ group.currentMonth }} of {{ group.durationMonths }}</span>
+          <span>{{ progressPercent() }}% complete</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar__fill" [style.width.%]="progressPercent()"></div>
+        </div>
+      </div>
+    </section>
+
+    @if (member(); as m) {
+      @if (m.currentPaymentStatus === 'pending') {
+        <app-notification-banner
+          variant="warning"
+          icon="schedule"
+          title="Your contribution is due"
+          [message]="'Pay your month ' + group.currentMonth + ' contribution of ' + formatCurrency(group.monthlyContribution) + ' to stay on track with the group.'"
+          actionLabel="Pay now"
+          (action)="payNow()"
+        ></app-notification-banner>
+      } @else if (canDraw()) {
+        <app-notification-banner
+          variant="info"
+          icon="workspace_premium"
+          title="Ready for this month's draw"
+          message="Every member's status is settled. Head to the draw page to reveal this month's winner."
+          actionLabel="Start draw"
+          (action)="goToDraw()"
+        ></app-notification-banner>
+      } @else if (hasDrawnThisMonth() && m.isEligible) {
+        <app-notification-banner
+          variant="success"
+          icon="check_circle"
+          title="You're all set for this month"
+          message="Your contribution is in and this month's draw is complete. We'll notify you before the next one."
+        ></app-notification-banner>
+      } @else if (m.hasWon) {
+        <app-notification-banner
+          variant="success"
+          icon="emoji_events"
+          [title]="'You already won this circle in month ' + m.wonMonth"
+          message="Keep contributing each month until the circle completes — that's what keeps the pot guaranteed for everyone else."
+        ></app-notification-banner>
+      }
+    }
+
+    <section>
+      <app-section-header
+        title="Group overview"
+        subtitle="Everything about your current savings circle, at a glance."
+      ></app-section-header>
+      <div class="summary-grid">
+        <app-summary-card
+          icon="payments"
+          label="Monthly contribution"
+          [value]="formatCurrency(group.monthlyContribution)"
+          accent="primary"
+        ></app-summary-card>
+        <app-summary-card
+          icon="groups"
+          label="Members joined"
+          [value]="group.members.length + ' / ' + group.totalMembers"
+          [sub]="(group.totalMembers - group.members.length) + ' seats open'"
+          accent="mint"
+        ></app-summary-card>
+        <app-summary-card
+          icon="savings"
+          label="Current prize pot"
+          [value]="formatCurrency(pot())"
+          sub="Guaranteed by the bank"
+          accent="gold"
+        ></app-summary-card>
+        <app-summary-card
+          icon="looks_one"
+          label="Your position"
+          [value]="'#' + position()"
+          sub="Join order in the circle"
+          accent="neutral"
+        ></app-summary-card>
+        <app-summary-card
+          icon="event_available"
+          label="Remaining months"
+          [value]="remainingMonths() + ''"
+          sub="Until the circle completes"
+          accent="primary"
+        ></app-summary-card>
+        <app-summary-card
+          icon="fact_check"
+          label="Paid this month"
+          [value]="paidCount() + ' / ' + group.members.length"
+          sub="Contributions collected"
+          accent="mint"
+        ></app-summary-card>
+      </div>
+    </section>
+
+    <section class="status-row">
+      <div class="status-card">
+        <span class="status-card__label">Your payment status</span>
+        @if (paymentStatus(); as p) {
+          <app-status-chip [variant]="p.variant" [label]="p.label" [icon]="p.icon"></app-status-chip>
+        }
+      </div>
+      <div class="status-card">
+        <span class="status-card__label">Your eligibility</span>
+        @if (eligibility(); as e) {
+          <app-status-chip [variant]="e.variant" [label]="e.label" [icon]="e.icon"></app-status-chip>
+        }
+      </div>
+      <div class="status-card status-card--members">
+        <span class="status-card__label">Members</span>
+        <div class="status-card__avatars">
+          @for (m of group.members; track m.id) {
+            <app-member-avatar
+              [initials]="m.avatarInitials"
+              [color]="m.avatarColor"
+              [size]="30"
+              [badge]="m.hasWon ? 'winner' : null"
+            ></app-member-avatar>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="actions-row">
+      @if (member()?.currentPaymentStatus === 'pending') {
+        <button type="button" class="btn btn--primary btn--lg" (click)="payNow()">
+          <mat-icon aria-hidden="true">payments</mat-icon>
+          Pay now
+        </button>
+      } @else if (canDraw()) {
+        <button type="button" class="btn btn--primary btn--lg" (click)="goToDraw()">
+          <mat-icon aria-hidden="true">workspace_premium</mat-icon>
+          Start draw
+        </button>
+      }
+      <a class="btn btn--secondary btn--lg" routerLink="/group">
+        <mat-icon aria-hidden="true">groups</mat-icon>
+        View group
+      </a>
+      <a class="btn btn--ghost btn--lg" routerLink="/join-group">
+        <mat-icon aria-hidden="true">travel_explore</mat-icon>
+        Join another group
+      </a>
+    </section>
+  } @else {
+    <app-empty-state
+      icon="groups"
+      title="You're not in a savings group yet"
+      message="Create a new circle or join one that's still filling up its seats."
+    >
+      <div class="actions-row">
+        <a class="btn btn--primary" routerLink="/create-group">Create a group</a>
+        <a class="btn btn--secondary" routerLink="/join-group">Join a group</a>
+      </div>
+    </app-empty-state>
+  }
+</div>

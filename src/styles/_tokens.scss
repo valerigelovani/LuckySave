@@ -1,0 +1,95 @@
+// LuckySave design tokens — the brand layer that sits on top of Material 3.
+// Keeping these as plain CSS custom properties gives every custom component
+// (cards, chips, avatars, timelines) a consistent, non-generic identity.
+
+:root {
+  // Brand colors
+  --ls-primary-900: #1c1550;
+  --ls-primary-800: #241c6b;
+  --ls-primary-700: #2f2489;
+  --ls-primary-600: #4433b0;
+  --ls-primary: #5b4fe9;
+  --ls-primary-400: #7b6ff0;
+  --ls-primary-300: #a29afa;
+  --ls-primary-200: #cac4fb;
+  --ls-primary-100: #e7e4fd;
+  --ls-primary-50: #f4f2fe;
+
+  --ls-mint-700: #0a8f5b;
+  --ls-mint-600: #06a86a;
+  --ls-mint: #17c27f;
+  --ls-mint-300: #6fe0ac;
+  --ls-mint-100: #d6f7e6;
+  --ls-mint-50: #eefcf5;
+
+  --ls-gold: #d99a2b;
+  --ls-gold-100: #fbead0;
+  --ls-gold-50: #fdf5e7;
+
+  --ls-coral: #e5484d;
+  --ls-coral-100: #fbdada;
+  --ls-coral-50: #fdeeee;
+
+  --ls-ink: #14152b;
+  --ls-ink-700: #33344f;
+  --ls-ink-500: #5c5d78;
+  --ls-ink-400: #83849c;
+  --ls-ink-300: #aeafc2;
+  --ls-ink-200: #d4d5e2;
+  --ls-ink-100: #e9eaf2;
+  --ls-ink-50: #f5f6fa;
+
+  --ls-surface: #ffffff;
+  --ls-surface-sunken: #f7f7fc;
+  --ls-surface-raised: #ffffff;
+  --ls-border: #eaeaf4;
+  --ls-border-strong: #dcddec;
+
+  // Elevation
+  --ls-shadow-sm: 0 1px 2px rgba(20, 21, 43, 0.04), 0 1px 3px rgba(20, 21, 43, 0.06);
+  --ls-shadow-md: 0 4px 10px rgba(20, 21, 43, 0.05), 0 2px 4px rgba(20, 21, 43, 0.04);
+  --ls-shadow-lg: 0 12px 28px rgba(20, 21, 43, 0.09), 0 4px 10px rgba(20, 21, 43, 0.05);
+  --ls-shadow-primary: 0 10px 24px rgba(91, 79, 233, 0.28);
+  --ls-shadow-mint: 0 10px 24px rgba(23, 194, 127, 0.24);
+
+  // Radius scale
+  --ls-radius-sm: 10px;
+  --ls-radius-md: 16px;
+  --ls-radius-lg: 22px;
+  --ls-radius-xl: 28px;
+  --ls-radius-pill: 999px;
+
+  // Spacing scale
+  --ls-space-1: 4px;
+  --ls-space-2: 8px;
+  --ls-space-3: 12px;
+  --ls-space-4: 16px;
+  --ls-space-5: 20px;
+  --ls-space-6: 24px;
+  --ls-space-7: 32px;
+  --ls-space-8: 40px;
+  --ls-space-9: 56px;
+
+  // Motion
+  --ls-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ls-ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ls-duration-fast: 140ms;
+  --ls-duration-base: 240ms;
+  --ls-duration-slow: 420ms;
+
+  // Layout
+  --ls-shell-max-width: 1180px;
+  --ls-nav-rail-width: 92px;
+  --ls-bottom-nav-height: 68px;
+}
+
+@keyframes ls-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

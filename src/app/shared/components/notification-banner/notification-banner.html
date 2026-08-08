@@ -1,0 +1,17 @@
+<div class="banner" [class]="'banner--' + variant">
+  <mat-icon class="banner__icon" aria-hidden="true">{{ icon }}</mat-icon>
+  <div class="banner__body">
+    <p class="banner__title">{{ title }}</p>
+    @if (message) {
+      <p class="banner__message">{{ message }}</p>
+    }
+  </div>
+  @if (actionLabel) {
+    <button type="button" class="banner__action" (click)="action.emit()">{{ actionLabel }}</button>
+  }
+  @if (dismissible) {
+    <button type="button" class="banner__dismiss" aria-label="Dismiss" (click)="dismiss.emit()">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  }
+</div>

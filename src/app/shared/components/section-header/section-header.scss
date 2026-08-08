@@ -1,0 +1,38 @@
+.section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ls-space-4);
+  margin-bottom: var(--ls-space-5);
+  flex-wrap: wrap;
+}
+
+.section-header__eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ls-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.section-header__title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ls-ink);
+}
+
+.section-header__subtitle {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ls-ink-400);
+  max-width: 52ch;
+}
+
+.section-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--ls-space-3);
+}

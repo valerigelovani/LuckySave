@@ -1,0 +1,115 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: var(--ls-radius-pill);
+  transition:
+    transform var(--ls-duration-fast) var(--ls-ease),
+    box-shadow var(--ls-duration-fast) var(--ls-ease),
+    background var(--ls-duration-fast) var(--ls-ease),
+    border-color var(--ls-duration-fast) var(--ls-ease),
+    opacity var(--ls-duration-fast) var(--ls-ease);
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ls-primary);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn--sm {
+  padding: 8px 14px;
+  font-size: 13px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.btn--lg {
+  padding: 14px 26px;
+  font-size: 15px;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--primary {
+  background: linear-gradient(135deg, var(--ls-primary-400), var(--ls-primary-700));
+  color: #fff;
+  box-shadow: var(--ls-shadow-primary);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 14px 30px rgba(91, 79, 233, 0.34);
+    transform: translateY(-1px);
+  }
+}
+
+.btn--mint {
+  background: linear-gradient(135deg, var(--ls-mint-300), var(--ls-mint-600));
+  color: #063d29;
+  box-shadow: var(--ls-shadow-mint);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.btn--secondary {
+  background: var(--ls-surface);
+  color: var(--ls-ink-700);
+  border: 1.5px solid var(--ls-border-strong);
+
+  &:hover:not(:disabled) {
+    background: var(--ls-surface-sunken);
+    border-color: var(--ls-ink-200);
+  }
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ls-primary-700);
+
+  &:hover:not(:disabled) {
+    background: var(--ls-primary-50);
+  }
+}
+
+.btn--danger {
+  background: var(--ls-coral-50);
+  color: #b52327;
+
+  &:hover:not(:disabled) {
+    background: var(--ls-coral-100);
+  }
+}
+
+.btn--icon {
+  padding: 10px;
+  border-radius: 50%;
+}

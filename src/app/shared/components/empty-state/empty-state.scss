@@ -1,0 +1,38 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--ls-space-8) var(--ls-space-5);
+  gap: var(--ls-space-2);
+}
+
+.empty-state__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--ls-primary-50);
+  color: var(--ls-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--ls-space-2);
+
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.empty-state__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ls-ink);
+}
+
+.empty-state__message {
+  font-size: 14px;
+  color: var(--ls-ink-400);
+  max-width: 40ch;
+}
