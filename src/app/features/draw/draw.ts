@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { DrawResult, GroupMember } from '../../core/models';
-import { formatCurrency } from '../../core/utils/currency.util';
 import { SectionHeader } from '../../shared/components/section-header/section-header';
 import { MemberAvatar } from '../../shared/components/member-avatar/member-avatar';
 import { CountdownDisplay } from '../../shared/components/countdown-display/countdown-display';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GroupService } from '../../services/group.service';
 import { DrawService } from '../../services/draw.service';
+import { I18nService } from '../../services/i18n.service';
 
 type DrawPhase = 'idle' | 'spinning' | 'revealed';
 
@@ -27,7 +28,7 @@ const CONFETTI_COLORS = ['#5B4FE9', '#17C27F', '#D99A2B', '#E5484D', '#2E86DE', 
 @Component({
   selector: 'app-draw-page',
   standalone: true,
-  imports: [RouterLink, MatIconModule, SectionHeader, MemberAvatar, CountdownDisplay, EmptyState],
+  imports: [RouterLink, MatIconModule, SectionHeader, MemberAvatar, CountdownDisplay, EmptyState, TranslatePipe],
   templateUrl: './draw.html',
   styleUrl: './draw.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +36,7 @@ const CONFETTI_COLORS = ['#5B4FE9', '#17C27F', '#D99A2B', '#E5484D', '#2E86DE', 
 export class DrawPage implements OnDestroy {
   private groupService = inject(GroupService);
   private drawService = inject(DrawService);
+  i18n = inject(I18nService);
   private timers: ReturnType<typeof setTimeout>[] = [];
 
   group = this.groupService.activeGroup;
@@ -79,16 +81,14 @@ export class DrawPage implements OnDestroy {
     return g ? this.groupService.estimatedPot(g) : 0;
   });
 
-  blockedReason = computed(() => {
+  blockedReasonKey = computed(() => {
     const g = this.group();
     if (!g) return '';
-    if (g.status === 'completed') return 'This circle has finished — every member has already received a payout.';
-    if (this.hasDrawnThisMonth()) return "This month's draw is already complete.";
-    if (this.eligible().length === 0) return 'No eligible members remain for a new draw.';
+    if (g.status === 'completed') return 'draw.blockedCompleted';
+    if (this.hasDrawnThisMonth()) return 'draw.blockedAlreadyDrawn';
+    if (this.eligible().length === 0) return 'draw.blockedNoEligible';
     return '';
   });
-
-  formatCurrency = formatCurrency;
 
   startDraw(): void {
     const group = this.group();

@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { formatCurrency } from '../../core/utils/currency.util';
-import { formatDate } from '../../core/utils/date.util';
 import { groupCode } from '../../shared/helpers/group-code.util';
 import { eligibilityChip, groupStatusChip, paymentStatusChip } from '../../shared/helpers/status.util';
 import { historyIcon } from '../../shared/helpers/history-icon.util';
@@ -12,7 +10,9 @@ import { MemberAvatar } from '../../shared/components/member-avatar/member-avata
 import { SummaryCard } from '../../shared/components/summary-card/summary-card';
 import { TimelineItem } from '../../shared/components/timeline-item/timeline-item';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GroupService } from '../../services/group.service';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-group-page',
@@ -26,6 +26,7 @@ import { GroupService } from '../../services/group.service';
     SummaryCard,
     TimelineItem,
     EmptyState,
+    TranslatePipe,
   ],
   templateUrl: './group.html',
   styleUrl: './group.scss',
@@ -33,6 +34,7 @@ import { GroupService } from '../../services/group.service';
 })
 export class GroupPage {
   private groupService = inject(GroupService);
+  i18n = inject(I18nService);
 
   group = this.groupService.activeGroup;
 
@@ -55,8 +57,6 @@ export class GroupPage {
 
   drawTimeline = computed(() => [...(this.group()?.draws ?? [])].reverse());
 
-  formatCurrency = formatCurrency;
-  formatDate = formatDate;
   groupStatusChip = groupStatusChip;
   paymentStatusChip = paymentStatusChip;
   eligibilityChip = eligibilityChip;

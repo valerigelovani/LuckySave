@@ -4,119 +4,116 @@
       <div class="success-card__icon">
         <mat-icon aria-hidden="true">check_circle</mat-icon>
       </div>
-      <h1 class="success-card__title">{{ g.name }} is ready</h1>
+      <h1 class="success-card__title">{{ 'createGroup.successTitle' | t: { name: g.name } }}</h1>
       <p class="success-card__subtitle">
-        Your savings circle has been created and set as your active group. Invite the remaining
-        {{ g.totalMembers - g.members.length }} member(s) to fill it up.
+        {{ 'createGroup.successSubtitle' | t: { count: g.totalMembers - g.members.length } }}
       </p>
 
       <div class="success-card__stats">
         <div>
-          <span>Monthly contribution</span>
-          <strong>{{ formatCurrency(g.monthlyContribution) }}</strong>
+          <span>{{ 'createGroup.monthlyContributionStat' | t }}</span>
+          <strong>{{ i18n.formatCurrency(g.monthlyContribution) }}</strong>
         </div>
         <div>
-          <span>Members</span>
+          <span>{{ 'createGroup.membersStat' | t }}</span>
           <strong>{{ g.members.length }} / {{ g.totalMembers }}</strong>
         </div>
         <div>
-          <span>Duration</span>
-          <strong>{{ g.durationMonths }} months</strong>
+          <span>{{ 'createGroup.durationStat' | t }}</span>
+          <strong>{{ 'createGroup.durationMonths' | t: { count: g.durationMonths } }}</strong>
         </div>
       </div>
 
       <div class="actions-row">
         <button type="button" class="btn btn--primary btn--lg" (click)="goToGroup()">
           <mat-icon aria-hidden="true">home</mat-icon>
-          Go to my dashboard
+          {{ 'common.goToMyDashboard' | t }}
         </button>
         <button type="button" class="btn btn--secondary btn--lg" (click)="createAnother()">
-          Create another group
+          {{ 'common.createAnotherGroup' | t }}
         </button>
       </div>
     </section>
   } @else {
     <header class="page-header">
       <div>
-        <p class="page-header__eyebrow">New savings circle</p>
-        <h1 class="page-header__title">Create a group</h1>
-        <p class="page-header__subtitle">
-          Set the contribution, size, and rules — you can invite members as soon as it's created.
-        </p>
+        <p class="page-header__eyebrow">{{ 'createGroup.eyebrow' | t }}</p>
+        <h1 class="page-header__title">{{ 'createGroup.title' | t }}</h1>
+        <p class="page-header__subtitle">{{ 'createGroup.subtitle' | t }}</p>
       </div>
     </header>
 
     <div class="create-layout">
       <form class="card create-form" [formGroup]="form" (ngSubmit)="submit()">
-        <app-section-header eyebrow="Basics" title="Name your group"></app-section-header>
+        <app-section-header [eyebrow]="'createGroup.basics' | t" [title]="'createGroup.nameYourGroup' | t"></app-section-header>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Group name</mat-label>
-          <input matInput formControlName="name" placeholder="e.g. Family Circle" maxlength="40" />
+          <mat-label>{{ 'createGroup.groupNameLabel' | t }}</mat-label>
+          <input matInput formControlName="name" [placeholder]="'createGroup.groupNamePlaceholder' | t" maxlength="40" />
           @if (form.controls.name.touched && form.controls.name.hasError('required')) {
-            <mat-error>A group name is required.</mat-error>
+            <mat-error>{{ 'createGroup.nameRequired' | t }}</mat-error>
           }
           @if (form.controls.name.touched && form.controls.name.hasError('minlength')) {
-            <mat-error>Use at least 3 characters.</mat-error>
+            <mat-error>{{ 'createGroup.nameMinLength' | t }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Description (optional)</mat-label>
+          <mat-label>{{ 'createGroup.descriptionLabel' | t }}</mat-label>
           <textarea
             matInput
             formControlName="description"
             rows="3"
             maxlength="240"
-            placeholder="What is this circle for?"
+            [placeholder]="'createGroup.descriptionPlaceholder' | t"
           ></textarea>
           <mat-hint align="end">{{ form.controls.description.value.length || 0 }} / 240</mat-hint>
         </mat-form-field>
 
-        <app-section-header eyebrow="Terms" title="Contribution & size"></app-section-header>
+        <app-section-header [eyebrow]="'createGroup.terms' | t" [title]="'createGroup.contributionSize' | t"></app-section-header>
 
         <div class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>Monthly contribution</mat-label>
-            <span matTextPrefix>$&nbsp;</span>
+            <mat-label>{{ 'createGroup.monthlyContributionLabel' | t }}</mat-label>
+            <span matTextPrefix>{{ i18n.currencySymbol() }}&nbsp;</span>
             <input matInput type="number" formControlName="monthlyContribution" min="10" max="5000" />
             @if (form.controls.monthlyContribution.touched && form.controls.monthlyContribution.invalid) {
-              <mat-error>Enter an amount between $10 and $5,000.</mat-error>
+              <mat-error>{{ 'createGroup.contributionError' | t: { min: i18n.formatCurrency(10), max: i18n.formatCurrency(5000) } }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Number of members</mat-label>
+            <mat-label>{{ 'createGroup.numberOfMembersLabel' | t }}</mat-label>
             <input matInput type="number" formControlName="totalMembers" min="2" max="20" />
             @if (form.controls.totalMembers.touched && form.controls.totalMembers.invalid) {
-              <mat-error>Choose between 2 and 20 members.</mat-error>
+              <mat-error>{{ 'createGroup.membersError' | t }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Duration (months)</mat-label>
+            <mat-label>{{ 'createGroup.durationLabel' | t }}</mat-label>
             <input matInput type="number" formControlName="durationMonths" min="2" max="24" />
             @if (form.controls.durationMonths.touched && form.controls.durationMonths.invalid) {
-              <mat-error>Choose between 2 and 24 months.</mat-error>
+              <mat-error>{{ 'createGroup.durationError' | t }}</mat-error>
             }
-            <mat-hint>We suggest matching this to your member count so everyone gets a turn.</mat-hint>
+            <mat-hint>{{ 'createGroup.durationHint' | t }}</mat-hint>
           </mat-form-field>
         </div>
 
-        <app-section-header eyebrow="Settings" title="Group rules"></app-section-header>
+        <app-section-header [eyebrow]="'createGroup.settings' | t" [title]="'createGroup.groupRules' | t"></app-section-header>
 
         <div class="toggle-row">
           <div>
-            <p class="toggle-row__title">Private group</p>
-            <p class="toggle-row__sub">Only people you invite can see and join this circle.</p>
+            <p class="toggle-row__title">{{ 'createGroup.privateGroupTitle' | t }}</p>
+            <p class="toggle-row__sub">{{ 'createGroup.privateGroupSub' | t }}</p>
           </div>
           <mat-slide-toggle formControlName="isPrivate"></mat-slide-toggle>
         </div>
 
         <div class="toggle-row">
           <div>
-            <p class="toggle-row__title">Automatic random draw</p>
-            <p class="toggle-row__sub">Let LuckySave pick the winner automatically each month.</p>
+            <p class="toggle-row__title">{{ 'createGroup.autoDrawTitle' | t }}</p>
+            <p class="toggle-row__sub">{{ 'createGroup.autoDrawSub' | t }}</p>
           </div>
           <mat-slide-toggle formControlName="autoRandomDraw"></mat-slide-toggle>
         </div>
@@ -124,38 +121,38 @@
         <div class="actions-row create-form__actions">
           <button type="submit" class="btn btn--primary btn--lg">
             <mat-icon aria-hidden="true">add_circle</mat-icon>
-            Create group
+            {{ 'createGroup.createGroupBtn' | t }}
           </button>
-          <a routerLink="/dashboard" class="btn btn--ghost btn--lg">Cancel</a>
+          <a routerLink="/dashboard" class="btn btn--ghost btn--lg">{{ 'common.cancel' | t }}</a>
         </div>
       </form>
 
       <aside class="card preview-card">
-        <span class="preview-card__eyebrow">Live preview</span>
-        <h3 class="preview-card__name">{{ form.controls.name.value || 'Your group name' }}</h3>
-        <p class="preview-card__desc">{{ form.controls.description.value || 'Add a short description so members know what this circle is for.' }}</p>
+        <span class="preview-card__eyebrow">{{ 'createGroup.livePreview' | t }}</span>
+        <h3 class="preview-card__name">{{ form.controls.name.value || ('createGroup.previewNamePlaceholder' | t) }}</h3>
+        <p class="preview-card__desc">{{ form.controls.description.value || ('createGroup.previewDescPlaceholder' | t) }}</p>
 
         <div class="preview-card__pot">
-          <span>Estimated monthly pot</span>
-          <strong>{{ formatCurrency(pot) }}</strong>
+          <span>{{ 'createGroup.estimatedPot' | t }}</span>
+          <strong>{{ i18n.formatCurrency(pot) }}</strong>
         </div>
 
         <ul class="preview-card__list">
           <li>
             <mat-icon aria-hidden="true">payments</mat-icon>
-            {{ formatCurrency(form.controls.monthlyContribution.value || 0) }} per member, per month
+            {{ 'createGroup.perMemberPerMonth' | t: { amount: i18n.formatCurrency(form.controls.monthlyContribution.value || 0) } }}
           </li>
           <li>
             <mat-icon aria-hidden="true">groups</mat-icon>
-            {{ form.controls.totalMembers.value || 0 }} members total
+            {{ 'createGroup.membersTotal' | t: { count: form.controls.totalMembers.value || 0 } }}
           </li>
           <li>
             <mat-icon aria-hidden="true">event_repeat</mat-icon>
-            Runs for {{ form.controls.durationMonths.value || 0 }} months
+            {{ 'createGroup.runsFor' | t: { count: form.controls.durationMonths.value || 0 } }}
           </li>
           <li>
             <mat-icon aria-hidden="true">{{ form.controls.isPrivate.value ? 'lock' : 'public' }}</mat-icon>
-            {{ form.controls.isPrivate.value ? 'Private — invite only' : 'Public — open to join' }}
+            {{ (form.controls.isPrivate.value ? 'createGroup.privateInviteOnly' : 'createGroup.publicOpen') | t }}
           </li>
         </ul>
       </aside>

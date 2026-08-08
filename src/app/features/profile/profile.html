@@ -8,34 +8,34 @@
     <div class="profile-header__info">
       <h1>{{ currentUser().name }}</h1>
       <p class="profile-header__email">{{ currentUser().email }}</p>
-      <p class="profile-header__since">Member since {{ formatDate(currentUser().memberSince) }}</p>
+      <p class="profile-header__since">{{ 'profile.since' | t: { date: i18n.formatDate(currentUser().memberSince) } }}</p>
     </div>
     @if (totalLoanBalance() > 0) {
       <app-status-chip
         variant="warning"
-        [label]="'Loan balance: ' + formatCurrency(totalLoanBalance())"
+        [label]="'profile.loanBalance' | t: { amount: i18n.formatCurrency(totalLoanBalance()) }"
         icon="account_balance"
       ></app-status-chip>
     } @else {
-      <app-status-chip variant="success" label="No outstanding loans" icon="verified"></app-status-chip>
+      <app-status-chip variant="success" [label]="'profile.noOutstandingLoans' | t" icon="verified"></app-status-chip>
     }
   </header>
 
   <section>
     <app-section-header
-      title="Your financial profile"
-      subtitle="A summary across every savings circle you're part of."
+      [title]="'profile.financialProfileTitle' | t"
+      [subtitle]="'profile.financialProfileSubtitle' | t"
     ></app-section-header>
     <div class="summary-grid">
-      <app-summary-card icon="payments" label="Total contributed" [value]="formatCurrency(totalContributed())" accent="primary"></app-summary-card>
-      <app-summary-card icon="emoji_events" label="Total won" [value]="formatCurrency(totalWon())" accent="gold"></app-summary-card>
-      <app-summary-card icon="workspace_premium" label="Draws participated" [value]="totalDraws() + ''" accent="mint"></app-summary-card>
-      <app-summary-card icon="fact_check" label="Payments made" [value]="totalPayments() + ''" accent="neutral"></app-summary-card>
-      <app-summary-card icon="groups" label="Active circles" [value]="activeGroupsCount() + ''" accent="primary"></app-summary-card>
+      <app-summary-card icon="payments" [label]="'profile.totalContributed' | t" [value]="i18n.formatCurrency(totalContributed())" accent="primary"></app-summary-card>
+      <app-summary-card icon="emoji_events" [label]="'profile.totalWon' | t" [value]="i18n.formatCurrency(totalWon())" accent="gold"></app-summary-card>
+      <app-summary-card icon="workspace_premium" [label]="'profile.drawsParticipated' | t" [value]="totalDraws() + ''" accent="mint"></app-summary-card>
+      <app-summary-card icon="fact_check" [label]="'profile.paymentsMade' | t" [value]="totalPayments() + ''" accent="neutral"></app-summary-card>
+      <app-summary-card icon="groups" [label]="'profile.activeCircles' | t" [value]="activeGroupsCount() + ''" accent="primary"></app-summary-card>
       <app-summary-card
         icon="account_balance"
-        label="Loan balance"
-        [value]="formatCurrency(totalLoanBalance())"
+        [label]="'profile.loanBalanceLabel' | t"
+        [value]="i18n.formatCurrency(totalLoanBalance())"
         [accent]="totalLoanBalance() > 0 ? 'coral' : 'mint'"
       ></app-summary-card>
     </div>
@@ -43,8 +43,8 @@
 
   <section>
     <app-section-header
-      title="Participation history"
-      subtitle="Your role and standing in each savings circle."
+      [title]="'profile.participationHistoryTitle' | t"
+      [subtitle]="'profile.participationHistorySubtitle' | t"
     ></app-section-header>
 
     @if (participation().length > 0) {
@@ -55,39 +55,39 @@
               <div>
                 <p class="participation-row__name">{{ p.group.name }}</p>
                 <p class="participation-row__meta">
-                  Position #{{ p.position }} · Joined {{ formatDate(p.member.joinedAt) }}
+                  {{ 'profile.positionJoined' | t: { position: p.position, date: i18n.formatDate(p.member.joinedAt) } }}
                 </p>
               </div>
               <app-status-chip
                 [variant]="groupStatusChip(p.group.status).variant"
-                [label]="groupStatusChip(p.group.status).label"
+                [label]="groupStatusChip(p.group.status).labelKey | t"
                 [icon]="groupStatusChip(p.group.status).icon"
               ></app-status-chip>
             </div>
 
             <div class="participation-row__stats">
               <div>
-                <span>Contributed</span>
-                <strong>{{ formatCurrency(p.contributed) }}</strong>
+                <span>{{ 'profile.contributed' | t }}</span>
+                <strong>{{ i18n.formatCurrency(p.contributed) }}</strong>
               </div>
               <div>
-                <span>Won</span>
-                <strong>{{ p.won > 0 ? formatCurrency(p.won) : '—' }}</strong>
+                <span>{{ 'profile.won' | t }}</span>
+                <strong>{{ p.won > 0 ? i18n.formatCurrency(p.won) : '—' }}</strong>
               </div>
               <div>
-                <span>Payments made</span>
+                <span>{{ 'profile.paymentsMadeLabel' | t }}</span>
                 <strong>{{ p.paymentsMade }}</strong>
               </div>
               @if (p.loanBalance > 0) {
                 <div>
-                  <span>Loan balance</span>
-                  <strong class="participation-row__warn">{{ formatCurrency(p.loanBalance) }}</strong>
+                  <span>{{ 'profile.loanBalanceRow' | t }}</span>
+                  <strong class="participation-row__warn">{{ i18n.formatCurrency(p.loanBalance) }}</strong>
                 </div>
               }
             </div>
 
             <button type="button" class="btn btn--secondary btn--sm" (click)="switchGroup(p.group.id)">
-              Set as active group
+              {{ 'common.setAsActiveGroup' | t }}
             </button>
           </div>
         }
@@ -95,12 +95,12 @@
     } @else {
       <app-empty-state
         icon="groups"
-        title="No groups yet"
-        message="Join or create a savings circle to start building your profile."
+        [title]="'profile.noGroupsTitle' | t"
+        [message]="'profile.noGroupsMessage' | t"
       >
         <div class="actions-row">
-          <a class="btn btn--primary" routerLink="/create-group">Create a group</a>
-          <a class="btn btn--secondary" routerLink="/join-group">Join a group</a>
+          <a class="btn btn--primary" routerLink="/create-group">{{ 'common.createAGroup' | t }}</a>
+          <a class="btn btn--secondary" routerLink="/join-group">{{ 'common.joinAGroup' | t }}</a>
         </div>
       </app-empty-state>
     }

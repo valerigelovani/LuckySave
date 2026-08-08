@@ -15,10 +15,23 @@
           class="rail__link"
         >
           <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
-          <span>{{ item.label }}</span>
+          <span>{{ item.labelKey | t }}</span>
         </a>
       }
     </nav>
+
+    <div class="rail__lang" role="group" aria-label="Language">
+      @for (lang of languages; track lang) {
+        <button
+          type="button"
+          class="rail__lang-btn"
+          [class.rail__lang-btn--active]="i18n.lang() === lang"
+          (click)="setLanguage(lang)"
+        >
+          {{ langLabel(lang) }}
+        </button>
+      }
+    </div>
 
     <a routerLink="/profile" routerLinkActive="rail__user--active" class="rail__user">
       <app-member-avatar
@@ -38,13 +51,27 @@
         </span>
         <span>LuckySave</span>
       </a>
-      <a routerLink="/profile" class="topbar__avatar">
-        <app-member-avatar
-          [initials]="currentUser().avatarInitials"
-          [color]="currentUser().avatarColor"
-          [size]="34"
-        ></app-member-avatar>
-      </a>
+      <div class="topbar__actions">
+        <div class="topbar__lang" role="group" aria-label="Language">
+          @for (lang of languages; track lang) {
+            <button
+              type="button"
+              class="topbar__lang-btn"
+              [class.topbar__lang-btn--active]="i18n.lang() === lang"
+              (click)="setLanguage(lang)"
+            >
+              {{ langLabel(lang) }}
+            </button>
+          }
+        </div>
+        <a routerLink="/profile" class="topbar__avatar">
+          <app-member-avatar
+            [initials]="currentUser().avatarInitials"
+            [color]="currentUser().avatarColor"
+            [size]="34"
+          ></app-member-avatar>
+        </a>
+      </div>
     </header>
 
     <main class="shell__content">
@@ -58,7 +85,7 @@
     @for (item of primaryNavItems; track item.path) {
       <a [routerLink]="item.path" routerLinkActive="bottom-nav__link--active" class="bottom-nav__link">
         <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
-        <span>{{ item.label }}</span>
+        <span>{{ item.labelKey | t }}</span>
       </a>
     }
   </nav>

@@ -2,17 +2,17 @@
   @if (group(); as g) {
     <header class="page-header">
       <div>
-        <p class="page-header__eyebrow">Group detail</p>
+        <p class="page-header__eyebrow">{{ 'group.detailEyebrow' | t }}</p>
         <div class="group-page__title-row">
           <h1 class="page-header__title">{{ g.name }}</h1>
           <app-status-chip
             [variant]="groupStatusChip(g.status).variant"
-            [label]="groupStatusChip(g.status).label"
+            [label]="groupStatusChip(g.status).labelKey | t"
             [icon]="groupStatusChip(g.status).icon"
           ></app-status-chip>
         </div>
         <p class="page-header__subtitle">{{ g.description }}</p>
-        <p class="group-page__code">Group ID · {{ code() }} · Created {{ formatDate(g.createdAt) }}</p>
+        <p class="group-page__code">{{ 'group.createdOn' | t: { code: code(), date: i18n.formatDate(g.createdAt) } }}</p>
       </div>
     </header>
 
@@ -20,24 +20,24 @@
       <a class="loan-alert" routerLink="/loan">
         <mat-icon aria-hidden="true">account_balance</mat-icon>
         <div class="loan-alert__body">
-          <p class="loan-alert__title">{{ outstandingLoans().length }} member(s) currently on bank coverage</p>
-          <p class="loan-alert__sub">A missed payment was covered by the bank. View loan details and repayment status.</p>
+          <p class="loan-alert__title">{{ 'group.loanAlertTitle' | t: { count: outstandingLoans().length } }}</p>
+          <p class="loan-alert__sub">{{ 'group.loanAlertSub' | t }}</p>
         </div>
         <mat-icon aria-hidden="true">chevron_right</mat-icon>
       </a>
     }
 
     <section class="summary-grid">
-      <app-summary-card icon="savings" label="Current prize pot" [value]="formatCurrency(pot())" sub="Guaranteed by the bank" accent="gold"></app-summary-card>
-      <app-summary-card icon="payments" label="Monthly contribution" [value]="formatCurrency(g.monthlyContribution)" accent="primary"></app-summary-card>
-      <app-summary-card icon="groups" label="Members" [value]="g.members.length + ' / ' + g.totalMembers" accent="mint"></app-summary-card>
-      <app-summary-card icon="event_repeat" label="Progress" [value]="'Month ' + g.currentMonth + ' / ' + g.durationMonths" accent="neutral"></app-summary-card>
+      <app-summary-card icon="savings" [label]="'dashboard.currentPrizePot' | t" [value]="i18n.formatCurrency(pot())" [sub]="'dashboard.guaranteedByBank' | t" accent="gold"></app-summary-card>
+      <app-summary-card icon="payments" [label]="'dashboard.monthlyContribution' | t" [value]="i18n.formatCurrency(g.monthlyContribution)" accent="primary"></app-summary-card>
+      <app-summary-card icon="groups" [label]="'dashboard.members' | t" [value]="g.members.length + ' / ' + g.totalMembers" accent="mint"></app-summary-card>
+      <app-summary-card icon="event_repeat" [label]="'group.progress' | t" [value]="'group.monthShort' | t: { current: g.currentMonth, total: g.durationMonths }" accent="neutral"></app-summary-card>
     </section>
 
     <section>
       <app-section-header
-        title="Members"
-        subtitle="Every member's payment status and draw eligibility, at a glance."
+        [title]="'group.membersTitle' | t"
+        [subtitle]="'group.membersSubtitle' | t"
       ></app-section-header>
 
       <div class="member-list">
@@ -54,13 +54,13 @@
               <p class="member-row__name">
                 {{ m.name }}
                 @if (m.isCurrentUser) {
-                  <span class="member-row__you">You</span>
+                  <span class="member-row__you">{{ 'common.you' | t }}</span>
                 }
               </p>
               <p class="member-row__meta">
-                Joined {{ formatDate(m.joinedAt) }} · Contributed {{ formatCurrency(m.totalContributed) }}
+                {{ 'group.joined' | t: { date: i18n.formatDate(m.joinedAt) } }} · {{ 'group.contributed' | t: { amount: i18n.formatCurrency(m.totalContributed) } }}
                 @if (m.hasWon) {
-                  · Won month {{ m.wonMonth }}
+                  · {{ 'group.wonMonth' | t: { month: i18n.monthOrdinal(m.wonMonth || 0) } }}
                 }
               </p>
             </div>
@@ -69,13 +69,13 @@
               <app-status-chip
                 size="sm"
                 [variant]="paymentStatusChip(m.currentPaymentStatus).variant"
-                [label]="paymentStatusChip(m.currentPaymentStatus).label"
+                [label]="paymentStatusChip(m.currentPaymentStatus).labelKey | t"
                 [icon]="paymentStatusChip(m.currentPaymentStatus).icon"
               ></app-status-chip>
               <app-status-chip
                 size="sm"
                 [variant]="eligibilityChip(m.hasWon, m.isEligible).variant"
-                [label]="eligibilityChip(m.hasWon, m.isEligible).label"
+                [label]="eligibilityChip(m.hasWon, m.isEligible).labelKey | t"
                 [icon]="eligibilityChip(m.hasWon, m.isEligible).icon"
               ></app-status-chip>
             </div>
@@ -87,8 +87,8 @@
     <div class="group-page__split">
       <section>
         <app-section-header
-          title="History of winners"
-          subtitle="Every completed draw in this circle so far."
+          [title]="'group.winnersTitle' | t"
+          [subtitle]="'group.winnersSubtitle' | t"
         ></app-section-header>
 
         @if (drawTimeline().length > 0) {
@@ -97,10 +97,10 @@
               <app-timeline-item
                 icon="workspace_premium"
                 variant="gold"
-                [title]="d.winnerName + ' won month ' + d.month"
-                [description]="'Prize pot of ' + formatCurrency(d.prizeAmount) + ' paid out.'"
-                [meta]="formatDate(d.drawDate)"
-                [amountLabel]="formatCurrency(d.prizeAmount)"
+                [title]="'group.winnerLine' | t: { name: d.winnerName, month: i18n.monthOrdinal(d.month) }"
+                [description]="'group.prizePaidOut' | t: { amount: i18n.formatCurrency(d.prizeAmount) }"
+                [meta]="i18n.formatDate(d.drawDate)"
+                [amountLabel]="i18n.formatCurrency(d.prizeAmount)"
                 [isLast]="last"
               ></app-timeline-item>
             }
@@ -109,17 +109,17 @@
           <div class="card">
             <app-empty-state
               icon="workspace_premium"
-              title="No draws yet"
-              message="Once every seat is filled, the first monthly draw can begin."
+              [title]="'group.noDrawsTitle' | t"
+              [message]="'group.noDrawsMessage' | t"
             ></app-empty-state>
           </div>
         }
       </section>
 
       <section>
-        <app-section-header title="Activity feed" subtitle="The latest updates in this group.">
+        <app-section-header [title]="'group.activityFeedTitle' | t" [subtitle]="'group.activityFeedSubtitle' | t">
           <a routerLink="/history" class="btn btn--ghost btn--sm">
-            View full history
+            {{ 'common.viewFullHistory' | t }}
             <mat-icon aria-hidden="true">arrow_forward</mat-icon>
           </a>
         </app-section-header>
@@ -129,10 +129,10 @@
             <app-timeline-item
               [icon]="historyIcon(item.type).icon"
               [variant]="historyIcon(item.type).variant"
-              [title]="item.title"
-              [description]="item.description"
-              [meta]="formatDate(item.timestamp)"
-              [amountLabel]="item.amount ? formatCurrency(item.amount) : ''"
+              [title]="i18n.tHistoryTitle(item)"
+              [description]="i18n.tHistoryDescription(item)"
+              [meta]="i18n.formatDate(item.timestamp)"
+              [amountLabel]="item.amount ? i18n.formatCurrency(item.amount) : ''"
               [isLast]="last"
             ></app-timeline-item>
           }
@@ -142,12 +142,12 @@
   } @else {
     <app-empty-state
       icon="groups"
-      title="No group selected"
-      message="Create a new circle or join one that's still filling up."
+      [title]="'group.noGroupTitle' | t"
+      [message]="'group.noGroupMessage' | t"
     >
       <div class="actions-row">
-        <a class="btn btn--primary" routerLink="/create-group">Create a group</a>
-        <a class="btn btn--secondary" routerLink="/join-group">Join a group</a>
+        <a class="btn btn--primary" routerLink="/create-group">{{ 'common.createAGroup' | t }}</a>
+        <a class="btn btn--secondary" routerLink="/join-group">{{ 'common.joinAGroup' | t }}</a>
       </div>
     </app-empty-state>
   }

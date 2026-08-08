@@ -7,13 +7,17 @@ export type HistoryEventType =
   | 'loan_created'
   | 'loan_repaid';
 
+export type HistoryEventParams = Record<string, string | number>;
+
 export interface HistoryItem {
   id: string;
   groupId: string;
   type: HistoryEventType;
   month: number;
-  title: string;
-  description: string;
+  titleKey: string;
+  titleParams?: HistoryEventParams;
+  descriptionKey: string;
+  descriptionParams?: HistoryEventParams;
   timestamp: string;
   amount?: number;
 }

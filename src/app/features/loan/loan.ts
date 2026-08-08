@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { GroupMember } from '../../core/models';
-import { formatCurrency } from '../../core/utils/currency.util';
-import { formatDate } from '../../core/utils/date.util';
 import { historyIcon } from '../../shared/helpers/history-icon.util';
 import { SectionHeader } from '../../shared/components/section-header/section-header';
 import { StatusChip } from '../../shared/components/status-chip/status-chip';
@@ -11,9 +9,11 @@ import { MemberAvatar } from '../../shared/components/member-avatar/member-avata
 import { TimelineItem } from '../../shared/components/timeline-item/timeline-item';
 import { NotificationBanner } from '../../shared/components/notification-banner/notification-banner';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GroupService } from '../../services/group.service';
 import { PaymentService } from '../../services/payment.service';
 import { LoanService } from '../../services/loan.service';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-loan-page',
@@ -27,6 +27,7 @@ import { LoanService } from '../../services/loan.service';
     TimelineItem,
     NotificationBanner,
     EmptyState,
+    TranslatePipe,
   ],
   templateUrl: './loan.html',
   styleUrl: './loan.scss',
@@ -36,6 +37,7 @@ export class LoanPage {
   private groupService = inject(GroupService);
   private paymentService = inject(PaymentService);
   private loanService = inject(LoanService);
+  i18n = inject(I18nService);
 
   group = this.groupService.activeGroup;
 
@@ -55,8 +57,6 @@ export class LoanPage {
 
   canSimulate = computed(() => this.member()?.currentPaymentStatus === 'pending');
 
-  formatCurrency = formatCurrency;
-  formatDate = formatDate;
   historyIcon = historyIcon;
 
   simulateMissedPayment(): void {

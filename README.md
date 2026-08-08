@@ -37,6 +37,15 @@ Then open `http://localhost:4200`. No further setup, environment variables, or b
 - **Profile** — the current user's contributions, winnings, draws, payments, and participation
   history across every group they belong to.
 
+## Language & currency
+
+The app defaults to Georgian (ქართული) with Lari (₾) currency, and can be switched to English
+(USD) from the toggle in the sidebar/top bar. The choice persists in `localStorage`. All interface
+copy — navigation, statuses, forms, toasts, and the generated activity timeline — is fully bilingual
+via a small signal-based `I18nService`; group and member names are treated as user content and are
+not translated when switching languages, the same way a real banking app wouldn't retranslate an
+account nickname.
+
 ## Architecture
 
 ```

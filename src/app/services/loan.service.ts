@@ -3,11 +3,13 @@ import { HistoryItem } from '../core/models';
 import { createId } from '../core/utils/id.util';
 import { StoreService } from './store.service';
 import { ToastService } from './toast.service';
+import { I18nService } from './i18n.service';
 
 @Injectable({ providedIn: 'root' })
 export class LoanService {
   private store = inject(StoreService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   repayLoan(groupId: string, loanId: string): void {
     const group = this.store.getGroup(groupId);
@@ -27,8 +29,10 @@ export class LoanService {
         groupId,
         type: 'loan_repaid',
         month: loanRecord.month,
-        title: `${loanRecord.memberName} repaid the loan`,
-        description: `The bank-covered loan of $${loanRecord.amount} was repaid in full.`,
+        titleKey: 'event.loanRepaid.title',
+        titleParams: { name: loanRecord.memberName },
+        descriptionKey: 'event.loanRepaid.desc',
+        descriptionParams: { amount: loanRecord.amount },
         timestamp: now,
         amount: loanRecord.amount,
       };
@@ -36,6 +40,9 @@ export class LoanService {
       return { ...g, loans, history: [historyEntry, ...g.history] };
     });
 
-    this.toast.success('Loan repaid', `The $${loanRecord.amount} loan has been settled.`);
+    this.toast.success(
+      this.i18n.t('toast.loanRepaidTitle'),
+      this.i18n.t('toast.loanRepaidMessage', { amount: this.i18n.formatCurrency(loanRecord.amount) }),
+    );
   }
 }

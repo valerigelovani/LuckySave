@@ -5,42 +5,42 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
-    title: 'Dashboard · LuckySave',
+    title: 'მთავარი · LuckySave',
   },
   {
     path: 'group',
     loadComponent: () => import('./features/group/group').then((m) => m.GroupPage),
-    title: 'My Group · LuckySave',
+    title: 'ჩემი ჯგუფი · LuckySave',
   },
   {
     path: 'draw',
     loadComponent: () => import('./features/draw/draw').then((m) => m.DrawPage),
-    title: 'Draw · LuckySave',
+    title: 'წილისყრა · LuckySave',
   },
   {
     path: 'history',
     loadComponent: () => import('./features/history/history').then((m) => m.HistoryPage),
-    title: 'History · LuckySave',
+    title: 'ისტორია · LuckySave',
   },
   {
     path: 'create-group',
     loadComponent: () => import('./features/create-group/create-group').then((m) => m.CreateGroupPage),
-    title: 'Create a Group · LuckySave',
+    title: 'ჯგუფის შექმნა · LuckySave',
   },
   {
     path: 'join-group',
     loadComponent: () => import('./features/join-group/join-group').then((m) => m.JoinGroupPage),
-    title: 'Join a Group · LuckySave',
+    title: 'ჯგუფში გაწევრიანება · LuckySave',
   },
   {
     path: 'loan',
     loadComponent: () => import('./features/loan/loan').then((m) => m.LoanPage),
-    title: 'Loan Coverage · LuckySave',
+    title: 'ბანკის დაფარვა · LuckySave',
   },
   {
     path: 'profile',
     loadComponent: () => import('./features/profile/profile').then((m) => m.ProfilePage),
-    title: 'Profile · LuckySave',
+    title: 'პროფილი · LuckySave',
   },
   { path: '**', redirectTo: 'dashboard' },
 ];

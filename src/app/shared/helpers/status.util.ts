@@ -4,36 +4,36 @@ export type ChipVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral' 
 
 export interface ChipDescriptor {
   variant: ChipVariant;
-  label: string;
+  labelKey: string;
   icon: string;
 }
 
 export function paymentStatusChip(status: PaymentStatus): ChipDescriptor {
   switch (status) {
     case 'paid':
-      return { variant: 'success', label: 'Paid', icon: 'check_circle' };
+      return { variant: 'success', labelKey: 'status.paid', icon: 'check_circle' };
     case 'pending':
-      return { variant: 'neutral', label: 'Pending', icon: 'schedule' };
+      return { variant: 'neutral', labelKey: 'status.pending', icon: 'schedule' };
     case 'late':
-      return { variant: 'danger', label: 'Late', icon: 'error' };
+      return { variant: 'danger', labelKey: 'status.late', icon: 'error' };
     case 'covered':
-      return { variant: 'info', label: 'Bank covered', icon: 'shield' };
+      return { variant: 'info', labelKey: 'status.covered', icon: 'shield' };
   }
 }
 
 export function groupStatusChip(status: GroupStatus): ChipDescriptor {
   switch (status) {
     case 'forming':
-      return { variant: 'warning', label: 'Filling up', icon: 'group_add' };
+      return { variant: 'warning', labelKey: 'status.forming', icon: 'group_add' };
     case 'active':
-      return { variant: 'success', label: 'Active', icon: 'bolt' };
+      return { variant: 'success', labelKey: 'status.active', icon: 'bolt' };
     case 'completed':
-      return { variant: 'neutral', label: 'Completed', icon: 'task_alt' };
+      return { variant: 'neutral', labelKey: 'status.completed', icon: 'task_alt' };
   }
 }
 
 export function eligibilityChip(hasWon: boolean, isEligible: boolean): ChipDescriptor {
-  if (hasWon) return { variant: 'primary', label: 'Already won', icon: 'emoji_events' };
-  if (isEligible) return { variant: 'success', label: 'Eligible', icon: 'check_circle' };
-  return { variant: 'neutral', label: 'Not eligible', icon: 'block' };
+  if (hasWon) return { variant: 'primary', labelKey: 'status.alreadyWon', icon: 'emoji_events' };
+  if (isEligible) return { variant: 'success', labelKey: 'status.eligible', icon: 'check_circle' };
+  return { variant: 'neutral', labelKey: 'status.notEligible', icon: 'block' };
 }

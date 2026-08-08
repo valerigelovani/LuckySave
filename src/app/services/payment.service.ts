@@ -3,11 +3,13 @@ import { HistoryItem, Loan, Payment } from '../core/models';
 import { createId } from '../core/utils/id.util';
 import { StoreService } from './store.service';
 import { ToastService } from './toast.service';
+import { I18nService } from './i18n.service';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
   private store = inject(StoreService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   payContribution(groupId: string, memberId: string): void {
     const group = this.store.getGroup(groupId);
@@ -19,7 +21,7 @@ export class PaymentService {
     const existing = group.payments.find((p) => p.memberId === memberId && p.month === group.currentMonth);
 
     if (existing && (existing.status === 'paid' || existing.status === 'covered')) {
-      this.toast.info('Already paid', 'This month is already settled.');
+      this.toast.info(this.i18n.t('toast.alreadyPaidTitle'), this.i18n.t('toast.alreadyPaidMessage'));
       return;
     }
 
@@ -56,8 +58,10 @@ export class PaymentService {
         groupId,
         type: 'payment_made',
         month: g.currentMonth,
-        title: `${member.name} paid the contribution`,
-        description: `Month ${g.currentMonth} contribution of $${g.monthlyContribution} received.`,
+        titleKey: 'event.paymentMade.title',
+        titleParams: { name: member.name },
+        descriptionKey: 'event.paymentMade.desc',
+        descriptionParams: { month: g.currentMonth, amount: g.monthlyContribution },
         timestamp: now,
         amount: g.monthlyContribution,
       };
@@ -65,7 +69,10 @@ export class PaymentService {
       return { ...g, payments, members, history: [historyEntry, ...g.history] };
     });
 
-    this.toast.success('Payment received', `Your $${group.monthlyContribution} contribution has been recorded.`);
+    this.toast.success(
+      this.i18n.t('toast.paymentReceivedTitle'),
+      this.i18n.t('toast.paymentReceivedMessage', { amount: this.i18n.formatCurrency(group.monthlyContribution) }),
+    );
   }
 
   simulateMissedPayment(groupId: string, memberId: string): void {
@@ -77,7 +84,7 @@ export class PaymentService {
 
     const existing = group.payments.find((p) => p.memberId === memberId && p.month === group.currentMonth);
     if (existing && (existing.status === 'paid' || existing.status === 'covered')) {
-      this.toast.info('Nothing to simulate', 'This month is already settled for this member.');
+      this.toast.info(this.i18n.t('toast.simulateNothingTitle'), this.i18n.t('toast.simulateNothingMessage'));
       return;
     }
 
@@ -118,8 +125,10 @@ export class PaymentService {
         groupId,
         type: 'payment_late',
         month: g.currentMonth,
-        title: `${member.name} missed the deadline`,
-        description: `${member.name}'s month ${g.currentMonth} contribution was not received by the due date.`,
+        titleKey: 'event.paymentLate.title',
+        titleParams: { name: member.name },
+        descriptionKey: 'event.paymentLate.desc',
+        descriptionParams: { name: member.name, month: g.currentMonth },
         timestamp: now,
       };
 
@@ -128,8 +137,9 @@ export class PaymentService {
         groupId,
         type: 'loan_created',
         month: g.currentMonth,
-        title: 'Bank covered the shortfall',
-        description: `The bank covered ${member.name}'s contribution and opened a loan record.`,
+        titleKey: 'event.loanCreated.title',
+        descriptionKey: 'event.loanCreated.desc',
+        descriptionParams: { name: member.name },
         timestamp: now,
         amount: g.monthlyContribution,
       };
@@ -143,6 +153,9 @@ export class PaymentService {
       };
     });
 
-    this.toast.warning('Payment covered by the bank', `A loan record was created for ${member.name}.`);
+    this.toast.warning(
+      this.i18n.t('toast.bankCoveredTitle'),
+      this.i18n.t('toast.bankCoveredMessage', { name: member.name }),
+    );
   }
 }

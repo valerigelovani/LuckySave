@@ -5,6 +5,7 @@ import { createId } from '../core/utils/id.util';
 import { CURRENT_USER_ID } from '../core/constants/app.constants';
 import { StoreService } from './store.service';
 import { ToastService } from './toast.service';
+import { I18nService } from './i18n.service';
 
 export interface CreateGroupPayload {
   name: string;
@@ -20,6 +21,7 @@ export interface CreateGroupPayload {
 export class GroupService {
   private store = inject(StoreService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   readonly groups = this.store.groups;
   readonly myGroups = this.store.myGroups;
@@ -85,8 +87,10 @@ export class GroupService {
         groupId,
         type: 'group_created',
         month: 0,
-        title: `${payload.name} created`,
-        description: `${user.name} started this savings group.`,
+        titleKey: 'event.groupCreated.title',
+        titleParams: { name: payload.name },
+        descriptionKey: 'event.groupCreated.desc',
+        descriptionParams: { user: user.name },
         timestamp: new Date().toISOString(),
       },
       {
@@ -94,8 +98,10 @@ export class GroupService {
         groupId,
         type: 'member_joined',
         month: 0,
-        title: `${user.name} joined`,
-        description: `${user.name} joined ${payload.name} as the founding member.`,
+        titleKey: 'event.memberJoined.title',
+        titleParams: { name: user.name },
+        descriptionKey: 'event.memberJoined.desc',
+        descriptionParams: { name: user.name, group: payload.name },
         timestamp: new Date().toISOString(),
       },
     ];
@@ -124,7 +130,10 @@ export class GroupService {
 
     this.store.addGroup(group);
     this.store.setActiveGroup(groupId);
-    this.toast.success('Group created', `${payload.name} is ready. Invite members to fill the remaining seats.`);
+    this.toast.success(
+      this.i18n.t('toast.groupCreatedTitle'),
+      this.i18n.t('toast.groupCreatedMessage', { name: payload.name }),
+    );
     return group;
   }
 
@@ -133,12 +142,12 @@ export class GroupService {
     if (!group) return;
 
     if (this.seatsRemaining(group) <= 0) {
-      this.toast.error('Group is full', 'There are no seats left in this group.');
+      this.toast.error(this.i18n.t('toast.groupFullTitle'), this.i18n.t('toast.groupFullMessage'));
       return;
     }
 
     if (group.members.some((m) => m.userId === CURRENT_USER_ID)) {
-      this.toast.info('Already joined', "You're already a member of this group.");
+      this.toast.info(this.i18n.t('toast.alreadyJoinedTitle'), this.i18n.t('toast.alreadyJoinedMessage'));
       return;
     }
 
@@ -165,8 +174,10 @@ export class GroupService {
         groupId,
         type: 'member_joined',
         month: g.currentMonth,
-        title: `${user.name} joined`,
-        description: `${user.name} joined ${g.name}.`,
+        titleKey: 'event.memberJoined.title',
+        titleParams: { name: user.name },
+        descriptionKey: 'event.memberJoined.desc',
+        descriptionParams: { name: user.name, group: g.name },
         timestamp: new Date().toISOString(),
       };
       return {
@@ -178,6 +189,9 @@ export class GroupService {
     });
 
     this.store.setActiveGroup(groupId);
-    this.toast.success('Welcome aboard', `You've joined ${group.name}.`);
+    this.toast.success(
+      this.i18n.t('toast.welcomeAboardTitle'),
+      this.i18n.t('toast.welcomeAboardMessage', { name: group.name }),
+    );
   }
 }

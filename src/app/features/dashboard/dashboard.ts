@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { GroupMember } from '../../core/models';
-import { formatCurrency } from '../../core/utils/currency.util';
 import { groupCode } from '../../shared/helpers/group-code.util';
 import { eligibilityChip, groupStatusChip, paymentStatusChip } from '../../shared/helpers/status.util';
 import { SummaryCard } from '../../shared/components/summary-card/summary-card';
@@ -12,10 +11,12 @@ import { CountdownDisplay } from '../../shared/components/countdown-display/coun
 import { NotificationBanner } from '../../shared/components/notification-banner/notification-banner';
 import { SectionHeader } from '../../shared/components/section-header/section-header';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GroupService } from '../../services/group.service';
 import { PaymentService } from '../../services/payment.service';
 import { DrawService } from '../../services/draw.service';
 import { StoreService } from '../../services/store.service';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -30,6 +31,7 @@ import { StoreService } from '../../services/store.service';
     NotificationBanner,
     SectionHeader,
     EmptyState,
+    TranslatePipe,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -41,6 +43,7 @@ export class Dashboard {
   private drawService = inject(DrawService);
   private store = inject(StoreService);
   private router = inject(Router);
+  i18n = inject(I18nService);
 
   currentUser = this.store.currentUser;
   myGroups = this.groupService.myGroups;
@@ -112,8 +115,6 @@ export class Dashboard {
     const group = this.activeGroup();
     return group ? groupCode(group.id) : '';
   });
-
-  formatCurrency = formatCurrency;
 
   switchGroup(groupId: string): void {
     this.groupService.setActiveGroup(groupId);

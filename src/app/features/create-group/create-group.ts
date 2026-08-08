@@ -6,9 +6,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { Group } from '../../core/models';
-import { formatCurrency } from '../../core/utils/currency.util';
 import { SectionHeader } from '../../shared/components/section-header/section-header';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GroupService } from '../../services/group.service';
+import { I18nService } from '../../services/i18n.service';
 
 @Component({
   selector: 'app-create-group-page',
@@ -21,6 +22,7 @@ import { GroupService } from '../../services/group.service';
     MatSlideToggleModule,
     MatIconModule,
     SectionHeader,
+    TranslatePipe,
   ],
   templateUrl: './create-group.html',
   styleUrl: './create-group.scss',
@@ -30,6 +32,7 @@ export class CreateGroupPage {
   private fb = inject(FormBuilder);
   private groupService = inject(GroupService);
   private router = inject(Router);
+  i18n = inject(I18nService);
 
   private durationTouchedByUser = false;
 
@@ -50,8 +53,6 @@ export class CreateGroupPage {
     const m = this.form.controls.totalMembers.value || 0;
     return c * m;
   }
-
-  formatCurrency = formatCurrency;
 
   constructor() {
     this.form.controls.totalMembers.valueChanges.subscribe((value) => {

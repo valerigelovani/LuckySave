@@ -1,15 +1,13 @@
 <div class="page join-group-page">
   <header class="page-header">
     <div>
-      <p class="page-header__eyebrow">Grow your savings</p>
-      <h1 class="page-header__title">Join a group</h1>
-      <p class="page-header__subtitle">
-        Browse savings circles that are still filling up their seats and join one that fits your budget.
-      </p>
+      <p class="page-header__eyebrow">{{ 'joinGroup.eyebrow' | t }}</p>
+      <h1 class="page-header__title">{{ 'joinGroup.title' | t }}</h1>
+      <p class="page-header__subtitle">{{ 'joinGroup.subtitle' | t }}</p>
     </div>
     <a routerLink="/create-group" class="btn btn--secondary">
       <mat-icon aria-hidden="true">add_circle</mat-icon>
-      Create your own
+      {{ 'common.createYourOwn' | t }}
     </a>
   </header>
 
@@ -23,7 +21,7 @@
               <p class="join-card__desc">{{ g.description }}</p>
             </div>
             @if (g.isPrivate) {
-              <mat-icon class="join-card__lock" aria-hidden="true" title="Private group">lock</mat-icon>
+              <mat-icon class="join-card__lock" aria-hidden="true" [title]="'createGroup.privateGroupTitle' | t">lock</mat-icon>
             }
           </div>
 
@@ -40,24 +38,24 @@
             <div class="progress-bar">
               <div class="progress-bar__fill progress-bar__fill--mint" [style.width.%]="fillRatio(g)"></div>
             </div>
-            <span>{{ g.members.length }} / {{ g.totalMembers }} filled</span>
+            <span>{{ 'joinGroup.filled' | t: { joined: g.members.length, total: g.totalMembers } }}</span>
           </div>
 
           <div class="join-card__stats">
             <div>
-              <span>Monthly</span>
-              <strong>{{ formatCurrency(g.monthlyContribution) }}</strong>
+              <span>{{ 'joinGroup.monthly' | t }}</span>
+              <strong>{{ i18n.formatCurrency(g.monthlyContribution) }}</strong>
             </div>
             <div>
-              <span>Est. pot</span>
-              <strong>{{ formatCurrency(estimatedPot(g)) }}</strong>
+              <span>{{ 'joinGroup.estPot' | t }}</span>
+              <strong>{{ i18n.formatCurrency(estimatedPot(g)) }}</strong>
             </div>
             <div>
-              <span>Next draw</span>
-              <strong>{{ formatDate(g.nextDrawDate) }}</strong>
+              <span>{{ 'joinGroup.nextDraw' | t }}</span>
+              <strong>{{ i18n.formatDate(g.nextDrawDate) }}</strong>
             </div>
             <div>
-              <span>Seats left</span>
+              <span>{{ 'joinGroup.seatsLeft' | t }}</span>
               <strong>{{ seatsRemaining(g) }}</strong>
             </div>
           </div>
@@ -71,7 +69,7 @@
             (click)="join(g)"
           >
             <mat-icon aria-hidden="true">{{ seatsRemaining(g) > 0 ? 'group_add' : 'block' }}</mat-icon>
-            {{ seatsRemaining(g) > 0 ? 'Join this group' : 'Group is full' }}
+            {{ (seatsRemaining(g) > 0 ? 'common.joinThisGroup' : 'common.groupIsFull') | t }}
           </button>
         </div>
       }
@@ -79,10 +77,10 @@
   } @else {
     <app-empty-state
       icon="travel_explore"
-      title="No open groups right now"
-      message="Every group is currently full. Start your own circle instead."
+      [title]="'joinGroup.noGroupsTitle' | t"
+      [message]="'joinGroup.noGroupsMessage' | t"
     >
-      <a class="btn btn--primary" routerLink="/create-group">Create a group</a>
+      <a class="btn btn--primary" routerLink="/create-group">{{ 'common.createAGroup' | t }}</a>
     </app-empty-state>
   }
 </div>

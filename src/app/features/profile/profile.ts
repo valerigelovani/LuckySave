@@ -2,16 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Group, GroupMember } from '../../core/models';
-import { formatCurrency } from '../../core/utils/currency.util';
-import { formatDate } from '../../core/utils/date.util';
 import { groupStatusChip } from '../../shared/helpers/status.util';
 import { SectionHeader } from '../../shared/components/section-header/section-header';
 import { SummaryCard } from '../../shared/components/summary-card/summary-card';
 import { StatusChip } from '../../shared/components/status-chip/status-chip';
 import { MemberAvatar } from '../../shared/components/member-avatar/member-avatar';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GroupService } from '../../services/group.service';
 import { StoreService } from '../../services/store.service';
+import { I18nService } from '../../services/i18n.service';
 
 interface GroupParticipation {
   group: Group;
@@ -27,7 +27,7 @@ interface GroupParticipation {
 @Component({
   selector: 'app-profile-page',
   standalone: true,
-  imports: [RouterLink, MatIconModule, SectionHeader, SummaryCard, StatusChip, MemberAvatar, EmptyState],
+  imports: [RouterLink, MatIconModule, SectionHeader, SummaryCard, StatusChip, MemberAvatar, EmptyState, TranslatePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,6 +36,7 @@ export class ProfilePage {
   private groupService = inject(GroupService);
   private store = inject(StoreService);
   private router = inject(Router);
+  i18n = inject(I18nService);
 
   currentUser = this.store.currentUser;
   myGroups = this.groupService.myGroups;
@@ -85,8 +86,6 @@ export class ProfilePage {
   totalLoanBalance = computed(() => this.participation().reduce((sum, p) => sum + p.loanBalance, 0));
   activeGroupsCount = computed(() => this.participation().filter((p) => p.group.status === 'active').length);
 
-  formatCurrency = formatCurrency;
-  formatDate = formatDate;
   groupStatusChip = groupStatusChip;
 
   switchGroup(groupId: string): void {

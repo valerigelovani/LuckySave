@@ -4,11 +4,13 @@ import { addDays } from '../core/utils/date.util';
 import { createId } from '../core/utils/id.util';
 import { StoreService } from './store.service';
 import { ToastService } from './toast.service';
+import { I18nService } from './i18n.service';
 
 @Injectable({ providedIn: 'root' })
 export class DrawService {
   private store = inject(StoreService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   eligibleMembers(group: Group): GroupMember[] {
     return group.members.filter((m) => m.isEligible);
@@ -84,8 +86,10 @@ export class DrawService {
         groupId,
         type: 'draw_completed',
         month: g.currentMonth,
-        title: `${winner.name} won the draw`,
-        description: `${winner.name} received the month ${g.currentMonth} prize pot of $${prizeAmount}.`,
+        titleKey: 'event.drawCompleted.title',
+        titleParams: { name: winner.name },
+        descriptionKey: 'event.drawCompleted.desc',
+        descriptionParams: { name: winner.name, month: g.currentMonth, amount: prizeAmount },
         timestamp: now,
         amount: prizeAmount,
       };
@@ -102,7 +106,7 @@ export class DrawService {
       };
     });
 
-    this.toast.success('Draw complete', `${winner.name} won this month's prize pot.`);
+    this.toast.success(this.i18n.t('toast.drawCompleteTitle'), this.i18n.t('toast.drawCompleteMessage', { name: winner.name }));
     return result;
   }
 }

@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { HistoryEventType } from '../../core/models';
-import { formatCurrency } from '../../core/utils/currency.util';
-import { formatDate } from '../../core/utils/date.util';
 import { historyIcon } from '../../shared/helpers/history-icon.util';
 import { SectionHeader } from '../../shared/components/section-header/section-header';
 import { TimelineItem } from '../../shared/components/timeline-item/timeline-item';
 import { MemberAvatar } from '../../shared/components/member-avatar/member-avatar';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GroupService } from '../../services/group.service';
+import { I18nService } from '../../services/i18n.service';
 
 type FilterKey = 'all' | 'draw' | 'payment' | 'loan' | 'membership';
 
@@ -24,24 +24,25 @@ const FILTER_TYPES: Record<FilterKey, HistoryEventType[] | null> = {
 @Component({
   selector: 'app-history-page',
   standalone: true,
-  imports: [RouterLink, MatIconModule, SectionHeader, TimelineItem, MemberAvatar, EmptyState],
+  imports: [RouterLink, MatIconModule, SectionHeader, TimelineItem, MemberAvatar, EmptyState, TranslatePipe],
   templateUrl: './history.html',
   styleUrl: './history.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoryPage {
   private groupService = inject(GroupService);
+  i18n = inject(I18nService);
 
   myGroups = this.groupService.myGroups;
   group = this.groupService.activeGroup;
 
   filter = signal<FilterKey>('all');
-  filters: { key: FilterKey; label: string }[] = [
-    { key: 'all', label: 'All activity' },
-    { key: 'draw', label: 'Draws' },
-    { key: 'payment', label: 'Payments' },
-    { key: 'loan', label: 'Bank coverage' },
-    { key: 'membership', label: 'Membership' },
+  filters: { key: FilterKey; labelKey: string }[] = [
+    { key: 'all', labelKey: 'history.filterAll' },
+    { key: 'draw', labelKey: 'history.filterDraws' },
+    { key: 'payment', labelKey: 'history.filterPayments' },
+    { key: 'loan', labelKey: 'history.filterLoans' },
+    { key: 'membership', labelKey: 'history.filterMembership' },
   ];
 
   monthlyDigest = computed(() => {
@@ -76,8 +77,6 @@ export class HistoryPage {
     return g.history.filter((item) => types.includes(item.type));
   });
 
-  formatCurrency = formatCurrency;
-  formatDate = formatDate;
   historyIcon = historyIcon;
 
   setFilter(key: FilterKey): void {

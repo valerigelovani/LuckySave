@@ -3,6 +3,7 @@ import {
   DrawResult,
   Group,
   GroupMember,
+  HistoryEventParams,
   HistoryItem,
   Loan,
   Payment,
@@ -10,7 +11,7 @@ import {
 import { getInitials, pickAvatarColor } from '../utils/avatar.util';
 import { addDays } from '../utils/date.util';
 import { createId } from '../utils/id.util';
-import { CURRENT_USER_ID } from './app.constants';
+import { CURRENT_USER_ID, CURRENT_USER_NAME } from './app.constants';
 
 function member(
   name: string,
@@ -18,7 +19,7 @@ function member(
 ): GroupMember {
   return {
     id: createId('mem'),
-    userId: name === 'Alex Rivera' ? CURRENT_USER_ID : createId('user'),
+    userId: name === CURRENT_USER_NAME ? CURRENT_USER_ID : createId('user'),
     name,
     avatarColor: pickAvatarColor(name),
     avatarInitials: getInitials(name),
@@ -101,8 +102,10 @@ function historyItem(
   groupId: string,
   type: HistoryItem['type'],
   month: number,
-  title: string,
-  description: string,
+  titleKey: string,
+  titleParams: HistoryEventParams | undefined,
+  descriptionKey: string,
+  descriptionParams: HistoryEventParams | undefined,
   daysAgo: number,
   amount?: number,
 ): HistoryItem {
@@ -111,8 +114,10 @@ function historyItem(
     groupId,
     type,
     month,
-    title,
-    description,
+    titleKey,
+    titleParams,
+    descriptionKey,
+    descriptionParams,
     timestamp: addDays(new Date(), -daysAgo).toISOString(),
     amount,
   };
@@ -126,63 +131,74 @@ function buildFamilyCircle(): Group {
   const groupId = 'grp-family-circle';
   const contribution = 200;
   const totalMembers = 6;
+  const groupName = 'ოჯახის წრე';
 
   const priya = member('Priya Sharma', { joinedDaysAgo: 70, hasWon: true, wonMonth: 1, isEligible: false, currentPaymentStatus: 'paid', totalContributed: 600 });
   const james = member('James Wilson', { joinedDaysAgo: 70, hasWon: true, wonMonth: 2, isEligible: false, currentPaymentStatus: 'paid', totalContributed: 600 });
-  const alex = member('Alex Rivera', { joinedDaysAgo: 70, isCurrentUser: true, currentPaymentStatus: 'pending', totalContributed: 400 });
+  const luka = member(CURRENT_USER_NAME, { joinedDaysAgo: 70, isCurrentUser: true, currentPaymentStatus: 'pending', totalContributed: 400 });
   const sara = member('Sara Kim', { joinedDaysAgo: 70, currentPaymentStatus: 'paid', totalContributed: 600 });
   const diego = member('Diego Fernandez', { joinedDaysAgo: 70, currentPaymentStatus: 'paid', totalContributed: 400 });
   const emma = member('Emma Novak', { joinedDaysAgo: 70, currentPaymentStatus: 'paid', totalContributed: 600 });
 
-  const members = [priya, james, alex, sara, diego, emma];
+  const members = [priya, james, luka, sara, diego, emma];
 
   const payments: Payment[] = [
     payment(groupId, priya.id, 1, contribution, 'paid', -42, 41),
     payment(groupId, james.id, 1, contribution, 'paid', -42, 40),
-    payment(groupId, alex.id, 1, contribution, 'paid', -42, 39),
+    payment(groupId, luka.id, 1, contribution, 'paid', -42, 39),
     payment(groupId, sara.id, 1, contribution, 'paid', -42, 41),
     payment(groupId, diego.id, 1, contribution, 'paid', -42, 38),
     payment(groupId, emma.id, 1, contribution, 'paid', -42, 40),
 
     payment(groupId, priya.id, 2, contribution, 'paid', -12, 12),
     payment(groupId, james.id, 2, contribution, 'paid', -12, 11),
-    payment(groupId, alex.id, 2, contribution, 'paid', -12, 10),
+    payment(groupId, luka.id, 2, contribution, 'paid', -12, 10),
     payment(groupId, sara.id, 2, contribution, 'paid', -12, 12),
     payment(groupId, diego.id, 2, contribution, 'covered', -12, undefined),
     payment(groupId, emma.id, 2, contribution, 'paid', -12, 11),
 
     payment(groupId, priya.id, 3, contribution, 'paid', 3, 2),
     payment(groupId, james.id, 3, contribution, 'paid', 3, 1),
-    payment(groupId, alex.id, 3, contribution, 'pending', 3, undefined),
+    payment(groupId, luka.id, 3, contribution, 'pending', 3, undefined),
     payment(groupId, sara.id, 3, contribution, 'paid', 3, 2),
     payment(groupId, diego.id, 3, contribution, 'paid', 3, 1),
     payment(groupId, emma.id, 3, contribution, 'paid', 3, 3),
   ];
 
   const draws: DrawResult[] = [
-    draw(groupId, 1, priya, contribution * totalMembers, [priya.id, james.id, alex.id, sara.id, diego.id, emma.id], 41),
-    draw(groupId, 2, james, contribution * totalMembers, [james.id, alex.id, sara.id, diego.id, emma.id], 11),
+    draw(groupId, 1, priya, contribution * totalMembers, [priya.id, james.id, luka.id, sara.id, diego.id, emma.id], 41),
+    draw(groupId, 2, james, contribution * totalMembers, [james.id, luka.id, sara.id, diego.id, emma.id], 11),
   ];
 
   const loans: Loan[] = [loan(groupId, diego, 2, contribution, 'outstanding', 11)];
 
   const history = sortHistory([
-    historyItem(groupId, 'group_created', 0, 'Family Circle created', 'Alex Rivera started this savings group.', 70),
-    ...members.map((m) => historyItem(groupId, 'member_joined', 0, `${m.name} joined`, `${m.name} joined Family Circle.`, 70)),
+    historyItem(groupId, 'group_created', 0, 'event.groupCreated.title', { name: groupName }, 'event.groupCreated.desc', { user: luka.name }, 70),
+    ...members.map((m) => historyItem(groupId, 'member_joined', 0, 'event.memberJoined.title', { name: m.name }, 'event.memberJoined.desc', { name: m.name, group: groupName }, 70)),
     ...payments.filter((p) => p.status === 'paid').map((p) => {
       const m = members.find((mm) => mm.id === p.memberId)!;
-      return historyItem(groupId, 'payment_made', p.month, `${m.name} paid the contribution`, `Month ${p.month} contribution of $${p.amount} received.`, p.paidAt ? Math.round((Date.now() - new Date(p.paidAt).getTime()) / 86400000) : 0, p.amount);
+      return historyItem(
+        groupId,
+        'payment_made',
+        p.month,
+        'event.paymentMade.title',
+        { name: m.name },
+        'event.paymentMade.desc',
+        { month: p.month, amount: p.amount },
+        p.paidAt ? Math.round((Date.now() - new Date(p.paidAt).getTime()) / 86400000) : 0,
+        p.amount,
+      );
     }),
-    historyItem(groupId, 'payment_late', 2, 'Diego Fernandez missed the deadline', "Diego's month 2 contribution was not received by the due date.", 13),
-    historyItem(groupId, 'loan_created', 2, 'Bank covered the shortfall', "The bank covered Diego's contribution and opened a loan record.", 11, contribution),
-    historyItem(groupId, 'draw_completed', 1, 'Priya Sharma won the draw', 'Priya Sharma received the month 1 prize pot.', 41, contribution * totalMembers),
-    historyItem(groupId, 'draw_completed', 2, 'James Wilson won the draw', 'James Wilson received the month 2 prize pot.', 11, contribution * totalMembers),
+    historyItem(groupId, 'payment_late', 2, 'event.paymentLate.title', { name: diego.name }, 'event.paymentLate.desc', { name: diego.name, month: 2 }, 13),
+    historyItem(groupId, 'loan_created', 2, 'event.loanCreated.title', undefined, 'event.loanCreated.desc', { name: diego.name }, 11, contribution),
+    historyItem(groupId, 'draw_completed', 1, 'event.drawCompleted.title', { name: priya.name }, 'event.drawCompleted.desc', { name: priya.name, month: 1, amount: contribution * totalMembers }, 41, contribution * totalMembers),
+    historyItem(groupId, 'draw_completed', 2, 'event.drawCompleted.title', { name: james.name }, 'event.drawCompleted.desc', { name: james.name, month: 2, amount: contribution * totalMembers }, 11, contribution * totalMembers),
   ]);
 
   return {
     id: groupId,
-    name: 'Family Circle',
-    description: 'Our household savings circle — six trusted members, one payout every month.',
+    name: groupName,
+    description: 'ჩვენი საოჯახო დანაზოგის ჯგუფი — ექვსი სანდო წევრი, ერთი გამოსავალი ყოველთვიურად.',
     monthlyContribution: contribution,
     totalMembers,
     durationMonths: 6,
@@ -204,35 +220,48 @@ function buildOfficeSquad(): Group {
   const groupId = 'grp-office-squad';
   const contribution = 150;
   const totalMembers = 4;
+  const groupName = 'საოფისე გუნდი';
 
   const marta = member('Marta Lopez', { joinedDaysAgo: 150, hasWon: true, wonMonth: 1, isEligible: false, currentPaymentStatus: 'paid', totalContributed: 600 });
   const noah = member('Noah Bennett', { joinedDaysAgo: 150, hasWon: true, wonMonth: 2, isEligible: false, currentPaymentStatus: 'paid', totalContributed: 600 });
-  const alex = member('Alex Rivera', { joinedDaysAgo: 150, isCurrentUser: true, hasWon: true, wonMonth: 3, isEligible: false, currentPaymentStatus: 'paid', totalContributed: 600 });
+  const luka = member(CURRENT_USER_NAME, { joinedDaysAgo: 150, isCurrentUser: true, hasWon: true, wonMonth: 3, isEligible: false, currentPaymentStatus: 'paid', totalContributed: 600 });
   const grace = member('Grace Liu', { joinedDaysAgo: 150, hasWon: true, wonMonth: 4, isEligible: false, currentPaymentStatus: 'paid', totalContributed: 600 });
 
-  const members = [marta, noah, alex, grace];
+  const members = [marta, noah, luka, grace];
   const monthWindows = [140, 110, 80, 50];
 
   const payments: Payment[] = monthWindows.flatMap((daysAgo, idx) =>
     members.map((m) => payment(groupId, m.id, idx + 1, contribution, 'paid', -daysAgo, daysAgo - 1)),
   );
 
-  const winners = [marta, noah, alex, grace];
+  const winners = [marta, noah, luka, grace];
   const draws: DrawResult[] = monthWindows.map((daysAgo, idx) => {
     const eligibleAtTime = winners.slice(idx).map((w) => w.id);
     return draw(groupId, idx + 1, winners[idx], contribution * totalMembers, eligibleAtTime, daysAgo);
   });
 
   const history = sortHistory([
-    historyItem(groupId, 'group_created', 0, 'Office Squad created', 'A colleague started this workplace savings group.', 150),
-    ...members.map((m) => historyItem(groupId, 'member_joined', 0, `${m.name} joined`, `${m.name} joined Office Squad.`, 150)),
-    ...draws.map((d) => historyItem(groupId, 'draw_completed', d.month, `${d.winnerName} won the draw`, `${d.winnerName} received the month ${d.month} prize pot.`, monthWindows[d.month - 1], d.prizeAmount)),
+    historyItem(groupId, 'group_created', 0, 'event.groupCreated.title', { name: groupName }, 'event.groupCreated.desc', { user: marta.name }, 150),
+    ...members.map((m) => historyItem(groupId, 'member_joined', 0, 'event.memberJoined.title', { name: m.name }, 'event.memberJoined.desc', { name: m.name, group: groupName }, 150)),
+    ...draws.map((d) =>
+      historyItem(
+        groupId,
+        'draw_completed',
+        d.month,
+        'event.drawCompleted.title',
+        { name: d.winnerName },
+        'event.drawCompleted.desc',
+        { name: d.winnerName, month: d.month, amount: d.prizeAmount },
+        monthWindows[d.month - 1],
+        d.prizeAmount,
+      ),
+    ),
   ]);
 
   return {
     id: groupId,
-    name: 'Office Squad',
-    description: 'A finished four-month circle with the team — everyone has taken their turn.',
+    name: groupName,
+    description: 'დასრულებული ოთხთვიანი ჯგუფი გუნდთან ერთად — ყველამ მიიღო თავისი ჯერი.',
     monthlyContribution: contribution,
     totalMembers,
     durationMonths: 4,
@@ -267,8 +296,8 @@ function buildOpenGroup(config: {
     .map((name, idx) => member(name, { joinedDaysAgo: 20 - idx * 2, currentPaymentStatus: 'pending', totalContributed: 0 }));
 
   const history = sortHistory([
-    historyItem(config.id, 'group_created', 0, `${config.name} created`, `${config.name} is filling up its member seats.`, 21),
-    ...members.map((m) => historyItem(config.id, 'member_joined', 0, `${m.name} joined`, `${m.name} joined ${config.name}.`, 20)),
+    historyItem(config.id, 'group_created', 0, 'event.groupCreated.title', { name: config.name }, 'event.groupCreated.desc', { user: members[0]?.name ?? '' }, 21),
+    ...members.map((m) => historyItem(config.id, 'member_joined', 0, 'event.memberJoined.title', { name: m.name }, 'event.memberJoined.desc', { name: m.name, group: config.name }, 20)),
   ]);
 
   return {
@@ -298,8 +327,8 @@ export function buildSeedState(): AppState {
 
   const downtown = buildOpenGroup({
     id: 'grp-downtown-colleagues',
-    name: 'Downtown Colleagues',
-    description: 'A relaxed savings circle for the downtown office crowd.',
+    name: 'ცენტრის კოლეგები',
+    description: 'მშვიდი დანაზოგის ჯგუფი ცენტრის ოფისის კოლეგებისთვის.',
     contribution: 150,
     totalMembers: 8,
     joined: 5,
@@ -311,8 +340,8 @@ export function buildSeedState(): AppState {
 
   const weekend = buildOpenGroup({
     id: 'grp-weekend-circle',
-    name: 'Weekend Circle',
-    description: 'Friends saving together, one payout every month.',
+    name: 'შაბათ-კვირის წრე',
+    description: 'მეგობრები ერთად აზოგებენ — ერთი გამოსავალი ყოველთვიურად.',
     contribution: 100,
     totalMembers: 10,
     joined: 8,
@@ -324,8 +353,8 @@ export function buildSeedState(): AppState {
 
   const neighborhood = buildOpenGroup({
     id: 'grp-neighborhood-savers',
-    name: 'Neighborhood Savers',
-    description: 'A trusted circle of neighbors — now full.',
+    name: 'სამეზობლო დამზოგველები',
+    description: 'მეზობლების სანდო ჯგუფი — ახლა უკვე სავსეა.',
     contribution: 250,
     totalMembers: 6,
     joined: 6,
@@ -338,10 +367,10 @@ export function buildSeedState(): AppState {
   return {
     currentUser: {
       id: CURRENT_USER_ID,
-      name: 'Alex Rivera',
-      email: 'alex.rivera@example.com',
-      avatarColor: pickAvatarColor('Alex Rivera'),
-      avatarInitials: getInitials('Alex Rivera'),
+      name: CURRENT_USER_NAME,
+      email: 'luka.meladze@example.com',
+      avatarColor: pickAvatarColor(CURRENT_USER_NAME),
+      avatarInitials: getInitials(CURRENT_USER_NAME),
       memberSince: addDays(new Date(), -150).toISOString(),
     },
     groups: [familyCircle, officeSquad, downtown, weekend, neighborhood],
